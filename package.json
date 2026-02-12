@@ -1,0 +1,18 @@
+{
+    "name": "evolveed",
+    "private": true,
+    "scripts": {
+        "dev": "turbo dev",
+        "build": "turbo build",
+        "lint": "turbo lint",
+        "dev:web": "turbo dev --filter=@evolveed/web",
+        "dev:api": "turbo dev --filter=@evolveed/api",
+        "db:push": "pnpm --filter @evolveed/api exec prisma db push",
+        "db:migrate": "pnpm --filter @evolveed/api exec prisma migrate dev",
+        "db:studio": "pnpm --filter @evolveed/api exec prisma studio"
+    },
+    "devDependencies": {
+        "turbo": "^2.4.0"
+    },
+    "packageManager": "pnpm@10.8.1"
+}

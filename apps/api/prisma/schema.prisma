@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum Goal {
+  EXAM
+  SKILL
+  INTERVIEW
+  CURIOSITY
+  CERTIFICATION
+}
+
+enum NodeStatus {
+  LOCKED
+  ACTIVE
+  COMPLETED
+}
+
+// ─── User ───────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  avatar       String?
+  passwordHash String?
+  provider     String?   // google, github, email
+  providerId   String?
+  role         Role      @default(STUDENT)
+  goal         Goal?
+  xp           Int       @default(0)
+  streak       Int       @default(0)
+  lastActiveAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions      Session[]
+  learningPaths LearningPath[]
+  tutorSessions TutorSession[]
+  notes         Note[]
+  flashcardDecks FlashcardDeck[]
+  quizAttempts  QuizAttempt[]
+  roomMemberships RoomMember[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@map("sessions")
+}
+
+// ─── AI Tutor ───────────────────────────────────────────
+
+model TutorSession {
+  id       String   @id @default(cuid())
+  topic    String
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages TutorMessage[]
+
+  @@map("tutor_sessions")
+}
+
+model TutorMessage {
+  id        String   @id @default(cuid())
+  role      String   // user | assistant
+  content   String   @db.Text
+  metadata  Json?    // AI insights, confidence, etc.
+  sessionId String
+  session   TutorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("tutor_messages")
+}
+
+// ─── Learning Paths ─────────────────────────────────────
+
+model LearningPath {
+  id        String   @id @default(cuid())
+  topic     String
+  goal      Goal
+  phases    Json     // Structured phases with metadata
+  progress  Float    @default(0)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  nodes PathNode[]
+
+  @@map("learning_paths")
+}
+
+model PathNode {
+  id        String     @id @default(cuid())
+  title     String
+  phase     Int
+  order     Int
+  status    NodeStatus @default(LOCKED)
+  resources Json?      // Curated resources for this node
+  pathId    String
+  path      LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@map("path_nodes")
+}
+
+// ─── Smart Notes ────────────────────────────────────────
+
+model Note {
+  id          String   @id @default(cuid())
+  title       String
+  sourceUrl   String?
+  sourceType  String?  // youtube, nptel, coursera
+  content     Json     // Structured: concepts, formulas, diagrams, etc.
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notes")
+}
+
+// ─── Practice Engine ────────────────────────────────────
+
+model FlashcardDeck {
+  id          String      @id @default(cuid())
+  title       String
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards       Flashcard[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("flashcard_decks")
+}
+
+model Flashcard {
+  id          String         @id @default(cuid())
+  front       String
+  back        String
+  nextReview  DateTime       @default(now())
+  interval    Int            @default(0)  // days
+  easeFactor  Float          @default(2.5)
+  deckId      String
+  deck        FlashcardDeck  @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("flashcards")
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  topic       String
+  score       Float
+  totalQs     Int
+  weakAreas   Json?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@map("quiz_attempts")
+}
+
+// ─── Community ──────────────────────────────────────────
+
+model StudyRoom {
+  id          String       @id @default(cuid())
+  name        String
+  topic       String
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  members     RoomMember[]
+
+  @@map("study_rooms")
+}
+
+model RoomMember {
+  id       String    @id @default(cuid())
+  role     String    @default("member") // host, member
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomId   String
+  room     StudyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  joinedAt DateTime  @default(now())
+
+  @@map("room_members")
+}

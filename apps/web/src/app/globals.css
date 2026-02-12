@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-background: oklch(0.15 0.02 283);
+  --color-foreground: oklch(0.98 0.01 210);
+  --color-card: oklch(0.20 0.03 287);
+  --color-card-foreground: oklch(0.98 0.01 210);
+  --color-popover: oklch(0.20 0.03 287);
+  --color-popover-foreground: oklch(0.98 0.01 210);
+  --color-primary: oklch(0.65 0.25 284);
+  --color-primary-foreground: oklch(0.98 0.01 210);
+  --color-secondary: oklch(0.60 0.15 189);
+  --color-secondary-foreground: oklch(0.98 0.01 210);
+  --color-muted: oklch(0.25 0.03 287);
+  --color-muted-foreground: oklch(0.70 0.02 215);
+  --color-accent: oklch(0.25 0.03 287);
+  --color-accent-foreground: oklch(0.98 0.01 210);
+  --color-destructive: oklch(0.45 0.15 0);
+  --color-destructive-foreground: oklch(0.98 0.01 210);
+  --color-border: oklch(0.30 0.03 287);
+  --color-input: oklch(0.30 0.03 287);
+  --color-ring: oklch(0.65 0.25 284);
+
+  --radius: 1rem;
+}
+
+* {
+  border-color: hsl(287 36% 20%);
+}
+
+body,
+html {
+  background-color: #0a050c;
+  color: #f8fafc;
+  font-family: var(--font-geist-sans), sans-serif;
+  min-height: 100vh;
+}
