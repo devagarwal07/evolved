@@ -1,7 +1,7 @@
 
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Prisma } from '../generated/client';
+import { Prisma } from '@prisma/client';
 // Import JwtAuthGuard once created, or use a placeholder for now if it creates a circular dependency or if I haven't created it yet.
 // For now, I'll omit the guard import and usage on public endpoints, or just comment it out.
 

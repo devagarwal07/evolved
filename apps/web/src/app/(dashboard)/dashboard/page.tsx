@@ -1,201 +1,250 @@
 "use client";
 
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import {
-    Brain,
-    Flame,
-    Target,
-    Trophy,
-    ArrowRight,
-    PlayCircle,
-    Clock,
-    Zap,
-} from "lucide-react";
+import { BookOpen, Brain, Clock, Flame, Target, Trophy, Sparkles, ArrowRight, Play, TrendingUp, Zap } from "lucide-react";
+import Link from "next/link";
+import { ROUTES } from "@/lib/routes";
 
 export default function DashboardPage() {
     return (
-        <div className="space-y-8">
-            {/* Welcome Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-white">
-                        Welcome back, Alex
-                    </h2>
-                    <p className="text-muted-foreground">
-                        You're on a 12-day streak! Keep the momentum going.
-                    </p>
+        <div className="space-y-8 max-w-7xl mx-auto">
+            {/* ─── Stats Row ─── */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Learning Time */}
+                <div className="glass-card p-5 group hover:border-primary/20 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <Clock className="w-5 h-5 text-primary" />
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">+2.5h</span>
+                    </div>
+                    <p className="text-2xl font-bold text-white">12.5h</p>
+                    <p className="text-xs text-slate-500 mt-0.5">This week</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" className="gap-2">
-                        <Clock className="w-4 h-4" />
-                        Daily Goal: 30/45m
-                    </Button>
-                    <Button className="gap-2 shadow-lg shadow-primary/20">
-                        <PlayCircle className="w-4 h-4" />
-                        Resume Learning
-                    </Button>
+
+                {/* Topics Mastered */}
+                <div className="glass-card p-5 group hover:border-secondary/20 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <Brain className="w-5 h-5 text-secondary" />
+                        </div>
+                        <span className="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">+3 new</span>
+                    </div>
+                    <p className="text-2xl font-bold text-white">24</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Topics mastered</p>
+                </div>
+
+                {/* Current Streak */}
+                <div className="glass-card p-5 group hover:border-orange-500/20 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-orange-500/15 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <Flame className="w-5 h-5 text-orange-500" />
+                        </div>
+                        <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full">Best: 21</span>
+                    </div>
+                    <p className="text-2xl font-bold text-white">12 days</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Current streak</p>
+                </div>
+
+                {/* Weekly Goal */}
+                <div className="glass-card p-5 group hover:border-emerald-500/20 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <Target className="w-5 h-5 text-emerald-500" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="relative w-12 h-12">
+                            <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
+                                <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
+                                <circle cx="24" cy="24" r="20" fill="none" stroke="#10b981" strokeWidth="4" strokeDasharray={`${0.72 * 125.6} 125.6`} strokeLinecap="round" />
+                            </svg>
+                            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white">72%</span>
+                        </div>
+                        <div>
+                            <p className="text-lg font-bold text-white">5/7</p>
+                            <p className="text-xs text-slate-500">Days active</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="bg-card/50 border-input hover:border-primary/50 transition-colors">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Daily Streak</CardTitle>
-                        <Flame className="h-4 w-4 text-orange-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">12 Days</div>
-                        <p className="text-xs text-muted-foreground">
-                            +2 days from last week
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card className="bg-card/50 border-input hover:border-primary/50 transition-colors">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total XP</CardTitle>
-                        <Zap className="h-4 w-4 text-yellow-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">12,450</div>
-                        <p className="text-xs text-muted-foreground">
-                            +150 XP earned today
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card className="bg-card/50 border-input hover:border-primary/50 transition-colors">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Current Level</CardTitle>
-                        <Trophy className="h-4 w-4 text-primary" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">Level 14</div>
-                        <Progress value={75} className="mt-2 h-2" />
-                        <p className="text-xs text-muted-foreground mt-2">
-                            75% to Level 15
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card className="bg-card/50 border-input hover:border-primary/50 transition-colors">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Skills Mastered</CardTitle>
-                        <Brain className="h-4 w-4 text-cyan-400" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">8</div>
-                        <p className="text-xs text-muted-foreground">
-                            Latest: System Design
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
+            {/* ─── Main Content Grid ─── */}
+            <div className="grid lg:grid-cols-3 gap-6">
+                {/* Continue Learning — takes 2 cols */}
+                <div className="lg:col-span-2 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-bold text-white">Continue Learning</h3>
+                        <Link href={ROUTES.DASHBOARD.LEARNING_PATHS} className="text-xs text-primary font-medium hover:underline flex items-center gap-1">
+                            View all <ArrowRight className="w-3 h-3" />
+                        </Link>
+                    </div>
 
-            {/* Main Content Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                {/* Continue Learning */}
-                <Card className="col-span-4 bg-card/60 border-input">
-                    <CardHeader>
-                        <CardTitle>Continue Learning</CardTitle>
-                        <CardDescription>
-                            Pick up right where you left off.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-4 p-4 rounded-xl bg-background/50 border border-border/50 hover:border-primary/30 transition-all cursor-pointer group">
-                                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
-                                    <Brain className="w-6 h-6" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h4 className="font-semibold text-white">System Design Patterns</h4>
-                                        <span className="text-xs text-muted-foreground">45% Complete</span>
-                                    </div>
-                                    <Progress value={45} className="h-2" />
-                                </div>
-                                <Button size="icon" variant="ghost" className="text-muted-foreground group-hover:text-primary">
-                                    <PlayCircle className="w-6 h-6" />
-                                </Button>
+                    {/* Learning Card 1 */}
+                    <div className="glass-card p-5 flex gap-5 group hover:border-primary/20 transition-all cursor-pointer">
+                        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/30 to-secondary/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <BookOpen className="w-7 h-7 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-bold text-white text-sm truncate">Machine Learning Fundamentals</h4>
+                                <span className="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full shrink-0">IN PROGRESS</span>
                             </div>
-
-                            <div className="flex items-center gap-4 p-4 rounded-xl bg-background/50 border border-border/50 hover:border-primary/30 transition-all cursor-pointer group">
-                                <div className="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
-                                    <Target className="w-6 h-6" />
+                            <p className="text-xs text-slate-500 mb-3">Phase 2: Supervised Learning — Decision Trees & Random Forests</p>
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_8px_rgba(139,92,246,0.4)]" style={{ width: "68%" }} />
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h4 className="font-semibold text-white">Advanced React Hooks</h4>
-                                        <span className="text-xs text-muted-foreground">12% Complete</span>
-                                    </div>
-                                    <Progress value={12} className="h-2" />
-                                </div>
-                                <Button size="icon" variant="ghost" className="text-muted-foreground group-hover:text-primary">
-                                    <PlayCircle className="w-6 h-6" />
-                                </Button>
+                                <span className="text-xs font-bold text-primary">68%</span>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
 
-                {/* Recommended */}
-                <Card className="col-span-3 bg-card/60 border-input">
-                    <CardHeader>
-                        <CardTitle>Recommended for You</CardTitle>
-                        <CardDescription>
-                            Based on your recent activity.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="space-y-4">
-                                {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-start gap-4 pb-4 border-b border-border/40 last:border-0 last:pb-0">
-                                        <div className="w-2 h-2 mt-2 rounded-full bg-primary shrink-0" />
-                                        <div>
-                                            <h5 className="font-medium text-white hover:text-primary cursor-pointer transition-colors block leading-tight">
-                                                The Future of Generative AI in Education
-                                            </h5>
-                                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                                An in-depth look at how large language models are transforming personalized learning experiences.
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button variant="outline" className="w-full mt-4 border-dashed border-border hover:border-primary hover:text-primary">
-                                View All Recommendations
-                            </Button>
+                    {/* Learning Card 2 */}
+                    <div className="glass-card p-5 flex gap-5 group hover:border-primary/20 transition-all cursor-pointer">
+                        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/30 to-secondary/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <Zap className="w-7 h-7 text-emerald-500" />
                         </div>
-                    </CardContent>
-                </Card>
-            </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-bold text-white text-sm truncate">System Design Interviews</h4>
+                                <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full shrink-0">REVIEW DUE</span>
+                            </div>
+                            <p className="text-xs text-slate-500 mb-3">Phase 3: Distributed Systems — CAP Theorem & Consistent Hashing</p>
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-secondary rounded-full shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: "45%" }} />
+                                </div>
+                                <span className="text-xs font-bold text-emerald-500">45%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            {/* Recent Activity Graph Placeholder */}
-            <Card className="bg-card/60 border-input">
-                <CardHeader>
-                    <CardTitle>Learning Activity</CardTitle>
-                    <CardDescription>Your study hours over the last 30 days.</CardDescription>
-                </CardHeader>
-                <CardContent className="h-[200px] flex items-center justify-center text-muted-foreground">
-                    {/* Placeholder for Recharts graph */}
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="w-full h-[150px] flex items-end gap-2">
-                            {[...Array(20)].map((_, i) => (
-                                <div key={i} className="w-4 bg-primary/20 rounded-t-sm hover:bg-primary/50 transition-colors" style={{ height: `${Math.random() * 100}%` }} />
+                {/* Right Column */}
+                <div className="space-y-4">
+                    {/* AI Tutor Quick Access */}
+                    <div className="glass-card-elevated p-5 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 orb orb-primary opacity-20" />
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Sparkles className="w-4 h-4 text-primary" />
+                                <h3 className="text-sm font-bold text-white">AI Tutor</h3>
+                                <span className="ml-auto text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">ONLINE</span>
+                            </div>
+                            <div className="space-y-3 mb-4">
+                                <div className="bg-white/[0.04] p-3 rounded-xl text-xs text-slate-300 leading-relaxed">
+                                    <span className="text-primary font-bold text-[10px] block mb-1">EVOLVE AI</span>
+                                    You&apos;re doing great with Decision Trees! Ready to tackle Random Forests next? 🌲
+                                </div>
+                                <div className="bg-primary/10 p-3 rounded-xl text-xs text-slate-300 ml-6 border border-primary/10">
+                                    Yes, let&apos;s start with feature importance first.
+                                </div>
+                            </div>
+                            <Link href={ROUTES.DASHBOARD.AI_TUTOR} className="block w-full py-2.5 bg-primary/15 hover:bg-primary/25 text-primary text-xs font-bold rounded-xl text-center transition-colors border border-primary/15">
+                                Continue Session →
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Upcoming Reviews */}
+                    <div className="glass-card p-5">
+                        <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                            <Trophy className="w-4 h-4 text-yellow-500" />
+                            Due for Review
+                        </h3>
+                        <div className="space-y-3">
+                            {[
+                                { topic: "Gradient Descent", time: "2h overdue", urgent: true },
+                                { topic: "Backpropagation", time: "Today", urgent: false },
+                                { topic: "Loss Functions", time: "Tomorrow", urgent: false },
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-center justify-between py-2 border-b border-white/[0.04] last:border-0">
+                                    <span className="text-sm text-slate-300">{item.topic}</span>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.urgent
+                                        ? "text-red-400 bg-red-500/10"
+                                        : "text-slate-500 bg-white/[0.04]"
+                                        }`}>
+                                        {item.time}
+                                    </span>
+                                </div>
                             ))}
                         </div>
-                        <span className="text-xs">Activity Graph Mockup</span>
+                        <Link href={ROUTES.DASHBOARD.PRACTICE} className="block mt-4 text-xs text-primary font-medium hover:underline text-center">
+                            Start Review Session →
+                        </Link>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
+
+            {/* ─── Bottom Row ─── */}
+            <div className="grid lg:grid-cols-3 gap-6">
+                {/* Weekly Activity */}
+                <div className="lg:col-span-2 glass-card p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-sm font-bold text-white">Weekly Activity</h3>
+                        <div className="flex items-center gap-4 text-[10px]">
+                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /> Study Time</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-secondary" /> Practice</span>
+                        </div>
+                    </div>
+                    <div className="flex items-end justify-between gap-3 h-40">
+                        {[
+                            { day: "Mon", study: 75, practice: 45 },
+                            { day: "Tue", study: 90, practice: 60 },
+                            { day: "Wed", study: 60, practice: 30 },
+                            { day: "Thu", study: 100, practice: 80 },
+                            { day: "Fri", study: 85, practice: 55 },
+                            { day: "Sat", study: 40, practice: 20 },
+                            { day: "Sun", study: 0, practice: 0 },
+                        ].map((d) => (
+                            <div key={d.day} className="flex-1 flex flex-col items-center gap-2">
+                                <div className="flex gap-1 items-end flex-1 w-full">
+                                    <div className="flex-1 bg-primary/80 rounded-t-md transition-all hover:bg-primary" style={{ height: `${d.study}%` }} />
+                                    <div className="flex-1 bg-secondary/80 rounded-t-md transition-all hover:bg-secondary" style={{ height: `${d.practice}%` }} />
+                                </div>
+                                <span className="text-[10px] text-slate-500 font-medium">{d.day}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="glass-card p-6 space-y-4">
+                    <h3 className="text-sm font-bold text-white">Quick Actions</h3>
+                    <div className="space-y-2">
+                        <Link href={ROUTES.DASHBOARD.LEARNING_PATHS} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors group">
+                            <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center group-hover:scale-105 transition-transform">
+                                <BookOpen className="w-4 h-4 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-sm font-medium text-white">New Learning Path</p>
+                                <p className="text-[10px] text-slate-500">Generate AI roadmap</p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" />
+                        </Link>
+                        <Link href={ROUTES.DASHBOARD.SMART_NOTES} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors group">
+                            <div className="w-9 h-9 rounded-lg bg-secondary/15 flex items-center justify-center group-hover:scale-105 transition-transform">
+                                <Play className="w-4 h-4 text-secondary" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-sm font-medium text-white">Smart Notes</p>
+                                <p className="text-[10px] text-slate-500">Video → exam-ready notes</p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-secondary transition-colors" />
+                        </Link>
+                        <Link href={ROUTES.DASHBOARD.PRACTICE} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors group">
+                            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center group-hover:scale-105 transition-transform">
+                                <TrendingUp className="w-4 h-4 text-emerald-500" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-sm font-medium text-white">Practice Engine</p>
+                                <p className="text-[10px] text-slate-500">Flashcards & quizzes</p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-500 transition-colors" />
+                        </Link>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

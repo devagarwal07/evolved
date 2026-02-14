@@ -1,93 +1,83 @@
 "use client";
 
-import Link from "next/link";
-import { Bell, Menu, Search, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Bell, Search, Flame, ChevronDown, LogOut } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Sidebar } from "./Sidebar"; // Reuse Sidebar for mobile sheet
+import Link from "next/link";
+import { ROUTES } from "@/lib/routes";
+import { useAuth } from "@/context/AuthContext";
 
 export function Header() {
+    const { user, logout } = useAuth();
+    const firstName = user?.name ? user.name.split(" ")[0] : "Learner";
+    const initials = user?.name
+        ? user.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
+        : "EV";
+
     return (
-        <header className="flex h-16 items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 sticky top-0 z-40">
-            {/* Mobile Sidebar Trigger */}
-            <div className="md:hidden mr-4">
-                <Sheet>
-                    <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <Menu className="h-5 w-5" />
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="p-0 border-r border-border">
-                        <Sidebar className="w-full" />
-                    </SheetContent>
-                </Sheet>
+        <header className="h-16 border-b border-white/[0.06] flex items-center justify-between px-8 bg-[#050507]/80 backdrop-blur-xl sticky top-0 z-30">
+            {/* Left: Greeting */}
+            <div>
+                <h2 className="text-sm font-semibold text-white">
+                    Welcome back, <span className="text-gradient-primary">{firstName}</span> 👋
+                </h2>
+                <p className="text-[11px] text-slate-500">Ready to evolve today?</p>
             </div>
 
-            <div className="flex-1 flex items-center gap-4">
-                <div className="relative w-full max-w-sm hidden md:block">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        type="search"
-                        placeholder="Search learning resources..."
-                        className="pl-8 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary h-9 rounded-lg"
+            {/* Right: Actions */}
+            <div className="flex items-center gap-3">
+                {/* Search */}
+                <div className="relative hidden md:block">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <input
+                        placeholder="Search topics..."
+                        className="pl-9 pr-4 py-2 w-56 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-primary/50 transition-colors"
                     />
                 </div>
-            </div>
 
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-white">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-background" />
-                </Button>
+                {/* Streak Badge */}
+                <div className="streak-badge flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold">
+                    <Flame className="w-3.5 h-3.5" />
+                    <span>{user?.streak || 0}</span>
+                </div>
 
+                {/* Notifications */}
+                <button className="relative p-2 rounded-lg hover:bg-white/[0.04] transition-colors">
+                    <Bell className="w-4.5 h-4.5 text-slate-400" />
+                    <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+                </button>
+
+                {/* User */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                            <Avatar className="h-8 w-8 ring-2 ring-border hover:ring-primary transition-all">
-                                <AvatarImage src="https://github.com/shadcn.png" alt="@user" />
-                                <AvatarFallback>JD</AvatarFallback>
+                        <button className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-white/[0.04] transition-colors">
+                            <Avatar className="w-8 h-8 border-2 border-primary/30">
+                                <AvatarImage src="" />
+                                <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">{initials}</AvatarFallback>
                             </Avatar>
-                        </Button>
+                            <ChevronDown className="w-3 h-3 text-slate-500" />
+                        </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
-                        <DropdownMenuLabel className="font-normal">
-                            <div className="flex flex-col space-y-1">
-                                <p className="text-sm font-medium leading-none">John Doe</p>
-                                <p className="text-xs leading-none text-muted-foreground">
-                                    john.doe@example.com
-                                </p>
-                            </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            import {ROUTES} from "@/lib/routes";
-
-                            // ... inside the component ...
-                            <DropdownMenuItem asChild>
-                                <Link href={ROUTES.DASHBOARD.SETTINGS} className="w-full cursor-pointer">
-                                    <User className="mr-2 h-4 w-4" />
-                                    <span>Profile</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Bell className="mr-2 h-4 w-4" />
-                                <span>Notifications</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-500 focus:text-red-500">
-                            Log out
+                    <DropdownMenuContent align="end" className="w-48 bg-[#0a0a0f] border-white/10">
+                        <DropdownMenuItem asChild>
+                            <Link href={ROUTES.DASHBOARD.SETTINGS} className="cursor-pointer">Profile</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={ROUTES.DASHBOARD.SETTINGS} className="cursor-pointer">Settings</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/[0.06]" />
+                        <DropdownMenuItem
+                            className="text-red-400 focus:text-red-400 cursor-pointer flex justify-between"
+                            onClick={logout}
+                        >
+                            Sign Out
+                            <LogOut className="w-3.5 h-3.5 ml-2" />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
