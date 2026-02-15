@@ -13,6 +13,7 @@ export interface User {
     role?: string;
     xp?: number;
     streak?: number;
+    bio?: string;
     // Add other fields as needed
 }
 

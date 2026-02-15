@@ -6,8 +6,39 @@ import { User, Bell, Lock, Globe, Moon, CreditCard, LogOut, ChevronRight, Check 
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
+import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
+    const { user, updateUser } = useAuth();
+    const [name, setName] = useState(user?.name || "");
+    const [bio, setBio] = useState(user?.bio || "");
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setName(user.name);
+            setBio(user.bio || "");
+        }
+    }, [user]);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            // Call API to update user
+            await api.patch(`/users/${user?.id}`, { name, bio });
+            updateUser({ name, bio });
+            // Show success toast (mock)
+            alert("Profile updated!");
+        } catch (err) {
+            console.error("Failed to update profile", err);
+            alert("Failed to update profile");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-12">
             <motion.div
@@ -39,7 +70,9 @@ export default function SettingsPage() {
                             <div className="relative group cursor-pointer">
                                 <Avatar className="w-24 h-24 border-4 border-[#050507] ring-4 ring-white/10 group-hover:ring-primary/30 transition-all">
                                     <AvatarImage src="/avatar-placeholder.png" alt="User" />
-                                    <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">DA</AvatarFallback>
+                                    <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
+                                        {user?.name?.substring(0, 2).toUpperCase() || "US"}
+                                    </AvatarFallback>
                                 </Avatar>
                                 <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                     <span className="text-xs text-white font-medium">Change</span>
@@ -51,19 +84,40 @@ export default function SettingsPage() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Full Name</label>
-                                    <input type="text" defaultValue="Dev Agarwal" className="pill-input pl-4" />
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="pill-input pl-4"
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Username</label>
-                                    <input type="text" defaultValue="@devagarwal" className="pill-input pl-4" />
+                                    <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Email</label>
+                                    <input
+                                        type="text"
+                                        value={user?.email || ""}
+                                        disabled
+                                        className="pill-input pl-4 opacity-50 cursor-not-allowed"
+                                    />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Bio</label>
-                                <textarea className="w-full pill-input pl-4 min-h-[100px] rounded-xl" defaultValue="Computer Science student passionate about AI and Web Development." />
+                                <textarea
+                                    className="w-full pill-input pl-4 min-h-[100px] rounded-xl"
+                                    value={bio}
+                                    onChange={(e) => setBio(e.target.value)}
+                                    placeholder="Tell us about yourself..."
+                                />
                             </div>
                             <div className="flex justify-end">
-                                <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20">Save Changes</Button>
+                                <Button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20"
+                                >
+                                    {isSaving ? "Saving..." : "Save Changes"}
+                                </Button>
                             </div>
                         </div>
                     </div>
