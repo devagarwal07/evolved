@@ -11,10 +11,11 @@ import { api } from "@/lib/api";
 import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, logout } = useAuth();
     const [name, setName] = useState(user?.name || "");
     const [bio, setBio] = useState(user?.bio || "");
     const [isSaving, setIsSaving] = useState(false);
+    const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
     useEffect(() => {
         if (user) {
@@ -23,17 +24,22 @@ export default function SettingsPage() {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (toast) {
+            const timer = setTimeout(() => setToast(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [toast]);
+
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            // Call API to update user
             await api.patch("/users/me", { name, bio });
             updateUser({ name, bio });
-            // Show success toast (mock)
-            alert("Profile updated!");
+            setToast({ type: "success", message: "Profile updated successfully!" });
         } catch (err) {
             console.error("Failed to update profile", err);
-            alert("Failed to update profile");
+            setToast({ type: "error", message: "Failed to update profile. Please try again." });
         } finally {
             setIsSaving(false);
         }
@@ -41,6 +47,21 @@ export default function SettingsPage() {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-12">
+            {/* Toast Notification */}
+            {toast && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg backdrop-blur-md border text-sm font-medium ${toast.type === "success"
+                        ? "bg-green-500/15 border-green-500/30 text-green-300"
+                        : "bg-red-500/15 border-red-500/30 text-red-300"
+                        }`}
+                >
+                    {toast.message}
+                </motion.div>
+            )}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -209,7 +230,7 @@ export default function SettingsPage() {
                         </div>
                     ))}
 
-                    <button className="w-full flex items-center justify-center p-4 mt-6 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-bold text-sm gap-2 border border-transparent hover:border-red-500/20">
+                    <button onClick={() => logout()} className="w-full flex items-center justify-center p-4 mt-6 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-bold text-sm gap-2 border border-transparent hover:border-red-500/20">
                         <LogOut className="w-4 h-4" />
                         Log Out of All Devices
                     </button>

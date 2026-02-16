@@ -15,9 +15,13 @@ import {
     Settings,
     Sparkles,
     Crown,
+    Trophy,
+    Flame,
 } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
+import { useState, useEffect } from "react";
 
 const navItems = [
     { name: "Dashboard", href: ROUTES.DASHBOARD.ROOT, icon: LayoutDashboard },
@@ -27,17 +31,34 @@ const navItems = [
     { name: "Practice", href: ROUTES.DASHBOARD.PRACTICE, icon: Dumbbell },
     { name: "Goals", href: ROUTES.DASHBOARD.GOALS, icon: Target },
     { name: "Community", href: ROUTES.DASHBOARD.COMMUNITY, icon: Users },
+    { name: "Achievements", href: ROUTES.DASHBOARD.ACHIEVEMENTS, icon: Trophy },
+];
+
+const LEVEL_NAMES = [
+    'Novice', 'Learner', 'Student', 'Scholar', 'Apprentice',
+    'Adept', 'Expert', 'Master', 'Sage', 'Grandmaster',
+    'Virtuoso', 'Prodigy', 'Genius', 'Luminary', 'Titan',
+    'Legend', 'Mythic', 'Transcendent', 'Immortal', 'Ascended',
 ];
 
 export function Sidebar({ className }: { className?: string }) {
     const pathname = usePathname();
     const { user } = useAuth();
+    const [gamification, setGamification] = useState<any>(null);
 
-    // Fallback or real data
-    const xp = user?.xp || 0;
-    const level = Math.floor(xp / 1000) + 1;
-    const nextLevelXp = level * 1000;
-    const progress = ((xp % 1000) / 1000) * 100;
+    useEffect(() => {
+        api.get("/gamification/profile")
+            .then((res) => setGamification(res.data))
+            .catch(() => { });
+    }, []);
+
+    const xp = gamification?.xp || user?.xp || 0;
+    const level = gamification?.level || 1;
+    const levelName = LEVEL_NAMES[(level || 1) - 1] || 'Ascended';
+    const progressPercent = gamification?.progressPercent || 0;
+    const nextThreshold = gamification?.nextThreshold || 50;
+    const streak = gamification?.streak || user?.streak || 0;
+    const badgeCount = gamification?.earnedCount || 0;
 
     return (
         <aside className={cn("w-72 bg-[#050507] border-r border-white/[0.08] flex flex-col h-screen", className)}>
@@ -56,21 +77,40 @@ export function Sidebar({ className }: { className?: string }) {
                 </div>
             </div>
 
-            {/* XP Level Bar */}
-            <div className="mx-6 mt-3 mb-6 p-3 glass-card rounded-xl">
+            {/* XP Level Bar - Gamified */}
+            <div className="mx-6 mt-3 mb-2 p-3 glass-card rounded-xl">
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                         <div className="level-badge px-2 py-0.5 rounded-full text-[10px] font-bold">
                             LVL {level}
                         </div>
-                        <span className="text-xs font-medium text-slate-300">Explorer</span>
+                        <span className="text-xs font-medium text-slate-300">{levelName}</span>
                     </div>
                     <span className="text-[10px] font-bold text-secondary">{xp.toLocaleString()} XP</span>
                 </div>
                 <div className="xp-bar">
-                    <div className="xp-bar-fill" style={{ width: `${progress}%` }} />
+                    <div className="xp-bar-fill" style={{ width: `${progressPercent}%` }} />
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1.5">{(nextLevelXp - xp).toLocaleString()} XP to Level {level + 1}</p>
+                <p className="text-[10px] text-slate-500 mt-1.5">
+                    {(nextThreshold - xp).toLocaleString()} XP to Level {level + 1}
+                </p>
+            </div>
+
+            {/* Streak & Badges Quick Stats */}
+            <div className="mx-6 mb-5 flex gap-2">
+                <div className="flex-1 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                    <Flame className="w-3.5 h-3.5 text-orange-400" />
+                    <span className="text-[11px] font-bold text-orange-300">{streak}</span>
+                    <span className="text-[9px] text-orange-400/70">day{streak !== 1 ? 's' : ''}</span>
+                </div>
+                <Link
+                    href={ROUTES.DASHBOARD.ACHIEVEMENTS}
+                    className="flex-1 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/15 transition-colors"
+                >
+                    <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                    <span className="text-[11px] font-bold text-yellow-300">{badgeCount}</span>
+                    <span className="text-[9px] text-yellow-400/70">badges</span>
+                </Link>
             </div>
 
             {/* Navigation */}

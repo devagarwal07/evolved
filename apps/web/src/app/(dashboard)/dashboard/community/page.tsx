@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { PlusCircle, Users, Loader2, LogIn, LogOut, Trash2, Sparkles, Crown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useGamification } from "@/context/GamificationContext";
 import { api } from "@/lib/api";
 
 interface RoomMember {
@@ -25,6 +26,7 @@ interface StudyRoom {
 
 export default function CommunityPage() {
     const { user } = useAuth();
+    const { showXPToast } = useGamification();
     const [rooms, setRooms] = useState<StudyRoom[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -51,6 +53,7 @@ export default function CommunityPage() {
         setIsCreating(true);
         try {
             const res = await api.post("/community/rooms", { name: roomName.trim(), topic: roomTopic.trim() });
+            showXPToast(10, 'Study room created');
             setRooms(prev => [res.data, ...prev]);
             setRoomName("");
             setRoomTopic("");

@@ -1,11 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { GamificationService, XP_REWARDS } from '../gamification/gamification.service';
 
 @Injectable()
 export class GoalsService {
     private readonly logger = new Logger(GoalsService.name);
 
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private gamification: GamificationService) { }
 
     async createGoal(userId: string, name: string, targetDate?: string) {
         return this.prisma.userGoal.create({
@@ -28,7 +29,7 @@ export class GoalsService {
         const goal = await this.prisma.userGoal.findFirst({ where: { id, userId } });
         if (!goal) throw new NotFoundException('Goal not found');
 
-        return this.prisma.userGoal.update({
+        const updated = await this.prisma.userGoal.update({
             where: { id },
             data: {
                 ...(data.name && { name: data.name }),
@@ -37,6 +38,13 @@ export class GoalsService {
                 ...(data.targetDate && { targetDate: new Date(data.targetDate) }),
             },
         });
+
+        // Award XP if goal just completed
+        if (data.status === 'completed' && goal.status !== 'completed') {
+            await this.gamification.awardXP(userId, XP_REWARDS.GOAL_COMPLETED, 'goal_completed');
+        }
+
+        return updated;
     }
 
     async deleteGoal(id: string, userId: string) {

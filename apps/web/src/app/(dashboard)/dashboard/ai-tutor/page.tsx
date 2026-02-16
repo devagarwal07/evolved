@@ -20,6 +20,7 @@ import {
     X,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useGamification } from "@/context/GamificationContext";
 import { api } from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -81,6 +82,7 @@ function TypingIndicator() {
 
 export default function AiTutorPage() {
     const { user } = useAuth();
+    const { showXPToast } = useGamification();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [sessionId, setSessionId] = useState<string | null>(null);
@@ -214,6 +216,7 @@ export default function AiTutorPage() {
             ]);
 
             // Update session list order
+            showXPToast(3, 'AI tutor chat');
             setSessions((prev) => {
                 const updated = prev.map((s) =>
                     s.id === sessionId ? { ...s, updatedAt: new Date().toISOString() } : s
@@ -302,8 +305,8 @@ export default function AiTutorPage() {
                             <div
                                 key={session.id}
                                 className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all text-xs ${sessionId === session.id
-                                        ? "bg-primary/15 text-white border border-primary/20"
-                                        : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+                                    ? "bg-primary/15 text-white border border-primary/20"
+                                    : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
                                     }`}
                                 onClick={() => loadSession(session.id)}
                             >
@@ -435,9 +438,9 @@ export default function AiTutorPage() {
                                             >
                                                 <div
                                                     className={`p-4 rounded-2xl text-sm leading-relaxed ${msg.role === "user"
-                                                            ? `bg-primary/15 text-white border border-primary/10 rounded-tr-sm ${msg.failed ? "border-red-500/30" : ""
-                                                            }`
-                                                            : "bg-white/[0.04] border border-white/[0.06] rounded-tl-sm text-slate-200"
+                                                        ? `bg-primary/15 text-white border border-primary/10 rounded-tr-sm ${msg.failed ? "border-red-500/30" : ""
+                                                        }`
+                                                        : "bg-white/[0.04] border border-white/[0.06] rounded-tl-sm text-slate-200"
                                                         }`}
                                                 >
                                                     {msg.role === "ai" ? (

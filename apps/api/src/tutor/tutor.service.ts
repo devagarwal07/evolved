@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GamificationService, XP_REWARDS } from '../gamification/gamification.service';
 
 const SYSTEM_PROMPT = `You are **EvolveEd AI Tutor** — a world-class, patient, and adaptive learning mentor built into the EvolveEd platform.
 
@@ -22,7 +23,7 @@ export class TutorService {
     private genAI: GoogleGenerativeAI | null = null;
     private model: any = null;
 
-    constructor(private prisma: PrismaService) {
+    constructor(private prisma: PrismaService, private gamification: GamificationService) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
             this.genAI = new GoogleGenerativeAI(apiKey);
@@ -125,6 +126,9 @@ export class TutorService {
             },
         });
 
+        // Award XP for sending a message
+        this.awardMessageXP(userId);
+
         // 3. Generate AI response
         let aiResponseContent = '';
 
@@ -211,5 +215,11 @@ export class TutorService {
         });
 
         return aiMessage;
+    }
+
+    private async awardMessageXP(userId: string) {
+        try {
+            await this.gamification.awardXP(userId, XP_REWARDS.TUTOR_MESSAGE, 'tutor_message');
+        } catch (e) { /* non-critical */ }
     }
 }

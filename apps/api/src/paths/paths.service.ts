@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GamificationService, XP_REWARDS } from '../gamification/gamification.service';
 
 const PATH_SYSTEM_PROMPT = `You are the **EvolveEd Learning Path Generator** — an AI that creates structured, progressive learning roadmaps.
 
@@ -42,7 +43,7 @@ export class PathsService {
     private model: any = null;
     private youtubeApiKey: string | null = null;
 
-    constructor(private prisma: PrismaService) {
+    constructor(private prisma: PrismaService, private gamification: GamificationService) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
             this.genAI = new GoogleGenerativeAI(apiKey);
@@ -197,6 +198,8 @@ Create a structured path with phases and nodes that takes a student from ${level
 
         if (!watchedVideos.includes(videoId)) {
             watchedVideos.push(videoId);
+            // Award XP for watching a video
+            await this.gamification.awardXP(userId, XP_REWARDS.VIDEO_WATCHED, 'video_watched');
         }
 
         const videos = resources.videos || [];
@@ -301,6 +304,9 @@ Create a structured path with phases and nodes that takes a student from ${level
 
         // Unlock next node if completed
         if (status === 'COMPLETED') {
+            // Award XP for completing a node
+            await this.gamification.awardXP(userId, XP_REWARDS.NODE_COMPLETED, 'node_completed');
+
             const sorted = allNodes.sort((a, b) => a.phase - b.phase || a.order - b.order);
             const idx = sorted.findIndex(n => n.id === nodeId);
             if (idx >= 0 && idx < sorted.length - 1) {
@@ -311,6 +317,11 @@ Create a structured path with phases and nodes that takes a student from ${level
                         data: { status: 'ACTIVE' },
                     });
                 }
+            }
+
+            // Check if entire path is complete
+            if (progress >= 100) {
+                await this.gamification.awardXP(userId, XP_REWARDS.PATH_COMPLETED, 'path_completed');
             }
         }
 

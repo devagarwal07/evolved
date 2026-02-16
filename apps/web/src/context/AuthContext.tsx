@@ -13,8 +13,11 @@ export interface User {
     role?: string;
     xp?: number;
     streak?: number;
+    level?: number;
     bio?: string;
-    // Add other fields as needed
+    avatar?: string;
+    badges?: string[];
+    lastActiveAt?: string;
 }
 
 interface AuthContextType {
@@ -25,6 +28,7 @@ interface AuthContextType {
     login: (token: string, user: User) => void;
     logout: () => void;
     updateUser: (updates: Partial<User>) => void;
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,6 +80,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     };
 
+    // Fetch fresh user data from API and sync to state + localStorage
+    const refreshUser = async () => {
+        try {
+            const res = await api.get("/users/me");
+            const freshUser = res.data;
+            setUser(freshUser);
+            localStorage.setItem("evolveed_user", JSON.stringify(freshUser));
+        } catch (err) {
+            console.error("Failed to refresh user", err);
+        }
+    };
+
     return (
         <AuthContext.Provider value={{
             user,
@@ -84,7 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isLoading,
             login,
             logout,
-            updateUser
+            updateUser,
+            refreshUser,
         }}>
             {children}
         </AuthContext.Provider>

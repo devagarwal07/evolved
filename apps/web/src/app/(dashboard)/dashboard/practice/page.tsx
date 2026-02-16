@@ -7,6 +7,7 @@ import {
     RotateCcw, Check, X, ChevronRight, Trophy, Clock
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useGamification } from "@/context/GamificationContext";
 import { api } from "@/lib/api";
 
 type Mode = "home" | "flashcards" | "study" | "quiz" | "results";
@@ -37,6 +38,7 @@ interface QuizQuestion {
 
 export default function PracticePage() {
     const { user } = useAuth();
+    const { showXPToast } = useGamification();
     const [mode, setMode] = useState<Mode>("home");
     const [decks, setDecks] = useState<FlashcardDeck[]>([]);
     const [activeDeck, setActiveDeck] = useState<FlashcardDeck | null>(null);
@@ -96,7 +98,7 @@ export default function PracticePage() {
     const reviewCard = async (quality: number) => {
         if (!activeDeck?.cards) return;
         const card = activeDeck.cards[currentCardIdx];
-        try { await api.post(`/practice/flashcards/${card.id}/review`, { quality }); } catch (err) { console.error(err); }
+        try { await api.post(`/practice/flashcards/${card.id}/review`, { quality }); showXPToast(3, 'Flashcard reviewed'); } catch (err) { console.error(err); }
         if (currentCardIdx < activeDeck.cards.length - 1) {
             setCurrentCardIdx(prev => prev + 1);
             setIsFlipped(false);
@@ -154,6 +156,8 @@ export default function PracticePage() {
                     totalQs: quizQuestions.length,
                     weakAreas: quizQuestions.filter((_, i) => !quizAnswers[i]).map(q => q.question),
                 });
+                showXPToast(20, 'Quiz completed');
+                if (score === quizQuestions.length) showXPToast(50, 'Perfect score!');
             } catch (err) { console.error(err); }
             setMode("results");
         }

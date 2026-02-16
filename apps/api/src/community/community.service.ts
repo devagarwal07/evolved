@@ -1,14 +1,15 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { GamificationService, XP_REWARDS } from '../gamification/gamification.service';
 
 @Injectable()
 export class CommunityService {
     private readonly logger = new Logger(CommunityService.name);
 
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private gamification: GamificationService) { }
 
     async createRoom(userId: string, name: string, topic: string) {
-        return this.prisma.studyRoom.create({
+        const room = await this.prisma.studyRoom.create({
             data: {
                 name,
                 topic,
@@ -18,6 +19,11 @@ export class CommunityService {
             },
             include: { members: { include: { user: { select: { id: true, name: true, avatar: true } } } }, _count: { select: { members: true } } },
         });
+
+        // Award XP for creating a room
+        await this.gamification.awardXP(userId, XP_REWARDS.ROOM_CREATED, 'room_created');
+
+        return room;
     }
 
     async getRooms() {

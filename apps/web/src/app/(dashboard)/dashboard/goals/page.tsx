@@ -6,6 +6,7 @@ import { Target, Trophy, TrendingUp, Calendar, Plus, Trash2, Check, Pause, Play,
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/context/AuthContext";
+import { useGamification } from "@/context/GamificationContext";
 import { api } from "@/lib/api";
 
 interface UserGoal {
@@ -28,6 +29,7 @@ interface Stats {
 
 export default function GoalsPage() {
     const { user } = useAuth();
+    const { showXPToast } = useGamification();
     const [goals, setGoals] = useState<UserGoal[]>([]);
     const [stats, setStats] = useState<Stats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -68,6 +70,7 @@ export default function GoalsPage() {
         try {
             const res = await api.patch(`/goals/${id}`, data);
             setGoals(prev => prev.map(g => g.id === id ? res.data : g));
+            if (data.status === 'completed') showXPToast(40, 'Goal completed');
             loadData();
         } catch (err) { console.error(err); }
     };

@@ -36,8 +36,11 @@ model User {
   id           String    @id @default(cuid())
   email        String    @unique
   name         String?
+  bio          String?
   avatar       String?
   passwordHash String?
+  badges       Json      @default("[]")
+  level        Int       @default(1)
   provider     String?   // google, github, email
   providerId   String?
   role         Role      @default(STUDENT)

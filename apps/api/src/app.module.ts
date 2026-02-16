@@ -12,6 +12,7 @@ import { PathsModule } from './paths/paths.module';
 import { PracticeModule } from './practice/practice.module';
 import { GoalsModule } from './goals/goals.module';
 import { CommunityModule } from './community/community.module';
+import { GamificationModule } from './gamification/gamification.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CommunityModule } from './community/community.module';
     PracticeModule,
     GoalsModule,
     CommunityModule,
+    GamificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

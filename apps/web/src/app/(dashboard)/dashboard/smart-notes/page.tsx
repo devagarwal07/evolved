@@ -18,6 +18,7 @@ import {
     RotateCcw,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useGamification } from "@/context/GamificationContext";
 import { api } from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -64,6 +65,7 @@ function ImportanceBadge({ level }: { level: string }) {
 
 export default function SmartNotesPage() {
     const { user } = useAuth();
+    const { showXPToast } = useGamification();
     const [notes, setNotes] = useState<NoteSummary[]>([]);
     const [activeNote, setActiveNote] = useState<Note | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -115,6 +117,7 @@ export default function SmartNotesPage() {
                 sourceType: sourceUrl.includes("youtube") ? "youtube" : sourceUrl.includes("nptel") ? "nptel" : sourceUrl ? "web" : undefined,
             });
             setActiveNote(res.data);
+            showXPToast(15, 'Smart note generated');
             setNotes((prev) => [
                 { id: res.data.id, title: res.data.title, sourceUrl: res.data.sourceUrl, sourceType: res.data.sourceType, createdAt: res.data.createdAt },
                 ...prev,

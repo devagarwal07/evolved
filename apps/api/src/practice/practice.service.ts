@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GamificationService, XP_REWARDS } from '../gamification/gamification.service';
 
 const FLASHCARD_PROMPT = `You are the **EvolveEd Flashcard Generator**. Generate study flashcards.
 
@@ -43,7 +44,7 @@ export class PracticeService {
     private genAI: GoogleGenerativeAI | null = null;
     private model: any = null;
 
-    constructor(private prisma: PrismaService) {
+    constructor(private prisma: PrismaService, private gamification: GamificationService) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
             this.genAI = new GoogleGenerativeAI(apiKey);
@@ -131,10 +132,18 @@ export class PracticeService {
         const nextReview = new Date();
         nextReview.setDate(nextReview.getDate() + interval);
 
-        return this.prisma.flashcard.update({
+        const updated = await this.prisma.flashcard.update({
             where: { id: cardId },
             data: { interval, easeFactor, nextReview },
         });
+
+        // Award XP for flashcard review — need deck owner
+        const deck = await this.prisma.flashcardDeck.findFirst({ where: { cards: { some: { id: cardId } } } });
+        if (deck) {
+            await this.gamification.awardXP(deck.userId, XP_REWARDS.FLASHCARD_REVIEW, 'flashcard_review');
+        }
+
+        return updated;
     }
 
     async deleteDeck(id: string, userId: string) {
@@ -173,9 +182,19 @@ export class PracticeService {
     }
 
     async submitQuiz(userId: string, topic: string, score: number, totalQs: number, weakAreas: any) {
-        return this.prisma.quizAttempt.create({
+        const attempt = await this.prisma.quizAttempt.create({
             data: { topic, score, totalQs, weakAreas, userId },
         });
+
+        // Award XP for quiz completion
+        await this.gamification.awardXP(userId, XP_REWARDS.QUIZ_COMPLETED, 'quiz_completed');
+
+        // Bonus XP for perfect score
+        if (score >= 100) {
+            await this.gamification.awardXP(userId, XP_REWARDS.QUIZ_PERFECT, 'quiz_perfect_score');
+        }
+
+        return attempt;
     }
 
     async getQuizHistory(userId: string) {

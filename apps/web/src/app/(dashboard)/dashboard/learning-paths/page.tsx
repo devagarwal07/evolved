@@ -8,6 +8,7 @@ import {
     Clock, Play, ChevronDown, ChevronRight, Eye, ArrowLeft, SkipForward, X
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useGamification } from "@/context/GamificationContext";
 import { api } from "@/lib/api";
 
 interface Video {
@@ -55,6 +56,7 @@ function formatViews(n: number): string {
 
 export default function LearningPathsPage() {
     const { user } = useAuth();
+    const { showXPToast } = useGamification();
     const [paths, setPaths] = useState<LearningPath[]>([]);
     const [activePath, setActivePath] = useState<LearningPath | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -153,6 +155,7 @@ export default function LearningPathsPage() {
         if (!activePath || !activeNodeId) return;
         try {
             const res = await api.post(`/paths/${activePath.id}/nodes/${activeNodeId}/watched`, { videoId });
+            showXPToast(10, 'Video watched');
             // Update local video state
             setNodeVideos(prev => prev.map(v => v.videoId === videoId ? { ...v, watched: true } : v));
             // Update local path progress
@@ -293,12 +296,12 @@ export default function LearningPathsPage() {
                                                 <button key={node.id} onClick={() => { if (node.status !== "LOCKED") loadNodeVideos(activePath.id, node); }}
                                                     disabled={node.status === "LOCKED"}
                                                     className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-all border-l-2 ${node.id === activeNodeId
-                                                            ? "border-l-primary bg-primary/5"
-                                                            : node.status === "COMPLETED"
-                                                                ? "border-l-emerald-500/30 hover:bg-white/[0.02]"
-                                                                : node.status === "LOCKED"
-                                                                    ? "border-l-transparent opacity-40 cursor-not-allowed"
-                                                                    : "border-l-transparent hover:bg-white/[0.02]"
+                                                        ? "border-l-primary bg-primary/5"
+                                                        : node.status === "COMPLETED"
+                                                            ? "border-l-emerald-500/30 hover:bg-white/[0.02]"
+                                                            : node.status === "LOCKED"
+                                                                ? "border-l-transparent opacity-40 cursor-not-allowed"
+                                                                : "border-l-transparent hover:bg-white/[0.02]"
                                                         }`}>
                                                     {node.status === "COMPLETED" ? (
                                                         <CheckCircle size={14} className="text-emerald-400 flex-shrink-0" />
@@ -334,8 +337,8 @@ export default function LearningPathsPage() {
                         {nodeVideos.map((video, i) => (
                             <button key={`${video.videoId}-${i}`} onClick={() => setActiveVideo(video)}
                                 className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all ${activeVideo?.videoId === video.videoId && activeVideo?.title === video.title
-                                        ? "bg-primary/5 border-l-2 border-l-primary"
-                                        : "hover:bg-white/[0.03] border-l-2 border-l-transparent"
+                                    ? "bg-primary/5 border-l-2 border-l-primary"
+                                    : "hover:bg-white/[0.03] border-l-2 border-l-transparent"
                                     }`}>
                                 <div className="relative w-16 h-9 rounded overflow-hidden flex-shrink-0 bg-white/[0.05]">
                                     <img src={video.thumbnail} alt="" className="w-full h-full object-cover" />

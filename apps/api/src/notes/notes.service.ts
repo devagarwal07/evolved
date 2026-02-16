@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GamificationService, XP_REWARDS } from '../gamification/gamification.service';
 
 const NOTES_SYSTEM_PROMPT = `You are the **EvolveEd Smart Notes Engine** — an AI that generates structured, exam-ready study notes from any topic.
 
@@ -38,7 +39,7 @@ export class NotesService {
     private genAI: GoogleGenerativeAI | null = null;
     private model: any = null;
 
-    constructor(private prisma: PrismaService) {
+    constructor(private prisma: PrismaService, private gamification: GamificationService) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
             this.genAI = new GoogleGenerativeAI(apiKey);
@@ -98,6 +99,9 @@ export class NotesService {
                 userId,
             },
         });
+
+        // Award XP for generating a note
+        await this.gamification.awardXP(userId, XP_REWARDS.NOTE_GENERATED, 'note_generated');
 
         return note;
     }

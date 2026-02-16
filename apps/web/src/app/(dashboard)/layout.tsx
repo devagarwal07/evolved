@@ -3,6 +3,7 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { useAuth } from "@/context/AuthContext";
+import { GamificationProvider } from "@/context/GamificationContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ROUTES } from "@/lib/routes";
@@ -36,19 +37,22 @@ export default function DashboardLayout({
     if (!isAuthenticated) return null;
 
     return (
-        <div className="flex min-h-screen bg-[#050507] text-foreground">
-            {/* Desktop Sidebar */}
-            <div className="hidden md:block md:w-72 fixed h-full z-30">
-                <Sidebar className="h-full" />
-            </div>
+        <GamificationProvider>
+            <div className="flex min-h-screen bg-[#050507] text-foreground">
+                {/* Desktop Sidebar */}
+                <div className="hidden md:block md:w-72 fixed h-full z-30">
+                    <Sidebar className="h-full" />
+                </div>
 
-            {/* Main Content Area */}
-            <div className="flex flex-col flex-1 md:pl-72 transition-all duration-300">
-                <Header />
-                <main className="flex-1 p-6 md:p-8 overflow-y-auto">
-                    {children}
-                </main>
+                {/* Main Content Area */}
+                <div className="flex flex-col flex-1 md:pl-72 transition-all duration-300">
+                    <Header />
+                    <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+                        {children}
+                    </main>
+                </div>
             </div>
-        </div>
+        </GamificationProvider>
     );
 }
+

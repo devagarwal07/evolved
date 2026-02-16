@@ -34,6 +34,7 @@ export const ROUTES = {
         PRACTICE: "/dashboard/practice",
         SMART_NOTES: "/dashboard/smart-notes",
         COMMUNITY: "/dashboard/community",
+        ACHIEVEMENTS: "/dashboard/achievements",
         SETTINGS: "/dashboard/settings",
     },
 } as const;
