@@ -1,90 +1,92 @@
 "use client";
 
-import { ScanEye, BrainCircuit, Zap, Target } from "lucide-react";
+import { ScanEye, BrainCircuit, Zap, Target, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { ScrollReveal, StaggerContainer, StaggerItem } from "../ScrollReveal";
 
 export function CoreCapabilities() {
     const capabilities = [
         {
             icon: ScanEye,
-            color: "text-cyan-400",
+            gradient: "from-cyan-400 to-blue-500",
             bg: "bg-cyan-500/10",
+            border: "hover:border-cyan-500/40",
+            glow: "group-hover:shadow-[0_0_40px_rgba(0,212,255,0.15)]",
             title: "Level Detection",
-            description: "Instantly assesses your current knowledge base to skip what you know and focus on what you don't. No more redundant lectures."
+            description: "Instantly assesses your current knowledge base to skip what you know and focus on what you don't."
         },
         {
             icon: BrainCircuit,
-            color: "text-purple-400",
+            gradient: "from-purple-400 to-violet-500",
             bg: "bg-purple-500/10",
+            border: "hover:border-purple-500/40",
+            glow: "group-hover:shadow-[0_0_40px_rgba(124,58,237,0.15)]",
             title: "Performance Memory",
-            description: "The AI tracks your struggle points over months, resurfacing difficult concepts at the perfect time to ensure long-term retention."
+            description: "Tracks your struggle points over months, resurfacing difficult concepts at the perfect time for retention."
         },
         {
             icon: Zap,
-            color: "text-amber-400",
+            gradient: "from-amber-400 to-orange-500",
             bg: "bg-amber-500/10",
+            border: "hover:border-amber-500/40",
+            glow: "group-hover:shadow-[0_0_40px_rgba(245,158,11,0.15)]",
             title: "Speed Adaptation",
-            description: "Feeling energized? The AI ramps up complexity. Feeling tired? It shifts to conceptual basics and intuitive analogies."
+            description: "Feeling energized? AI ramps up complexity. Tired? It shifts to conceptual basics and intuitive analogies."
         },
         {
             icon: Target,
-            color: "text-emerald-400",
+            gradient: "from-emerald-400 to-green-500",
             bg: "bg-emerald-500/10",
+            border: "hover:border-emerald-500/40",
+            glow: "group-hover:shadow-[0_0_40px_rgba(16,185,129,0.15)]",
             title: "Weakness Tracking",
-            description: "Precision identifies \"blind spots\" in your mental model, providing targeted micro-drills to fix foundations before moving forward."
+            description: "Identifies \"blind spots\" in your mental model, providing targeted micro-drills to fix foundations."
         }
     ];
 
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.2
-            }
-        }
-    };
-
-    const item = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-    };
-
     return (
-        <section className="max-w-7xl mx-auto px-6 mb-32">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-16"
-            >
-                <h2 className="text-4xl font-bold mb-4 text-white">Mastery-Driven Core</h2>
-                <p className="text-slate-400">Built on four pillars of cognitive science and adaptive computing.</p>
-            </motion.div>
+        <section className="max-w-7xl mx-auto px-6 py-32 relative">
+            {/* Background orb */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#7C3AED] rounded-full blur-[250px] opacity-[0.06] pointer-events-none" />
 
-            <motion.div
-                variants={container}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true }}
-                className="grid md:grid-cols-2 gap-8"
-            >
+            <ScrollReveal className="text-center mb-16">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
+                    <Sparkles className="w-3 h-3 text-[#00D4FF]" />
+                    Core Engine
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black mb-4 text-white">
+                    Mastery-Driven <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#00D4FF]">Core</span>
+                </h2>
+                <p className="text-slate-400 max-w-lg mx-auto">
+                    Built on four pillars of cognitive science and adaptive computing.
+                </p>
+            </ScrollReveal>
+
+            <StaggerContainer className="grid md:grid-cols-2 gap-6" staggerDelay={0.15}>
                 {capabilities.map((cap, index) => (
-                    <motion.div
-                        key={index}
-                        variants={item}
-                        whileHover={{ scale: 1.02, borderColor: "rgba(139,92,246,0.3)" }}
-                        className="glass-card p-10 rounded-xl group hover:border-primary/50 transition-all duration-300 border border-white/5"
-                    >
-                        <div className={`w-14 h-14 ${cap.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                            <cap.icon className={`${cap.color} w-8 h-8`} />
-                        </div>
-                        <h3 className="text-2xl font-bold mb-4 text-white">{cap.title}</h3>
-                        <p className="text-slate-400 leading-relaxed text-lg">{cap.description}</p>
-                    </motion.div>
+                    <StaggerItem key={index}>
+                        <motion.div
+                            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                            className={`group relative p-8 rounded-2xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.06] ${cap.border} ${cap.glow} transition-all duration-500 overflow-hidden cursor-default`}
+                        >
+                            {/* Animated gradient border on hover */}
+                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                                style={{
+                                    background: `linear-gradient(135deg, transparent 40%, rgba(124,58,237,0.05) 60%, rgba(0,212,255,0.05))`,
+                                }}
+                            />
+
+                            <div className="relative z-10">
+                                <div className={`w-14 h-14 ${cap.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-white/5`}>
+                                    <cap.icon className={`w-7 h-7 bg-gradient-to-br ${cap.gradient} bg-clip-text`} style={{ color: 'inherit' }} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all">{cap.title}</h3>
+                                <p className="text-slate-400 leading-relaxed text-[15px]">{cap.description}</p>
+                            </div>
+                        </motion.div>
+                    </StaggerItem>
                 ))}
-            </motion.div>
+            </StaggerContainer>
         </section>
     );
 }

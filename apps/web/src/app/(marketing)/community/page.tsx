@@ -1,120 +1,156 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Users, Video, MessageSquare, Trophy, Star, Flame, Lock, Globe, PlusCircle } from "lucide-react";
+import { Users, Trophy, PlusCircle, Sparkles, MessageSquare, Flame } from "lucide-react";
+import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/marketing/ScrollReveal";
+
+const challenges = [
+    { title: "The Big-O Blitz", desc: "Master time complexity analysis with the community.", participants: "842+", color: "#7C3AED" },
+    { title: "React Mastery Race", desc: "Build 10 real-world components in 10 days.", participants: "1.2K+", color: "#00D4FF" },
+    { title: "ML Paper Reading Club", desc: "Deep dive into latest research papers together.", participants: "634+", color: "#39FF14" },
+];
+
+const leaderboard = [
+    { rank: "01", name: "Julian V.", xp: "12,840 XP", color: "#FFD700" },
+    { rank: "02", name: "Aria M.", xp: "11,420 XP", color: "#C0C0C0" },
+    { rank: "03", name: "Dev K.", xp: "10,890 XP", color: "#CD7F32" },
+];
 
 export default function CommunityPage() {
     return (
-        <div className="min-h-screen bg-[#0a060e] text-slate-100 font-sans selection:bg-[#8c25f4]/30 selection:text-white">
-            <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto space-y-32">
-                {/* Hero Section */}
-                <section className="text-center space-y-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#8c25f4]/10 border border-[#8c25f4]/20 text-[#8c25f4] text-sm font-medium mb-4">
-                        <Users className="w-4 h-4" />
-                        Social Learning is 40% more effective
+        <div className="pt-32 pb-20 px-6">
+            <div className="max-w-7xl mx-auto space-y-32">
+                {/* Hero */}
+                <ScrollReveal className="text-center space-y-6">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-[#00D4FF] uppercase tracking-widest mb-4">
+                        <Users className="w-3 h-3" /> Social Learning is 40% more effective
                     </div>
-                    <h1 className="text-6xl md:text-8xl font-bold tracking-tighter max-w-4xl mx-auto text-white">
-                        Learn Together.<br /><span className="text-[#8c25f4]">Evolve Together.</span>
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter max-w-4xl mx-auto text-white">
+                        Learn Together.<br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#A855F7]">Evolve Together.</span>
                     </h1>
                     <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
                         Unlock higher retention rates through peer teaching, collaborative solving, and AI-moderated study sessions.
                     </p>
                     <div className="flex items-center justify-center gap-4 pt-4">
-                        <Button className="bg-[#8c25f4] hover:bg-[#8c25f4]/90 text-white px-8 py-4 rounded-full font-bold text-lg shadow-[0_0_20px_rgba(140,37,244,0.2)] transition-all transform hover:scale-105">
+                        <Button className="bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] text-white px-8 py-6 rounded-full font-black text-lg shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] hover:scale-105 transition-all">
                             Start Learning With Friends
                         </Button>
-                        <button className="bg-white/5 hover:bg-white/10 px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/10 text-white">
+                        <Button variant="outline" className="bg-white/[0.02] border-white/[0.08] text-white px-8 py-6 rounded-full font-bold text-lg hover:bg-white/[0.06] transition-all">
                             Explore Groups
-                        </button>
+                        </Button>
                     </div>
-                </section>
+                </ScrollReveal>
 
                 {/* Virtual Study Rooms */}
-                <section className="space-y-12">
-                    <div className="flex items-end justify-between">
-                        <div className="space-y-2">
-                            <h2 className="text-4xl font-bold tracking-tight text-white">Virtual Study Rooms</h2>
-                            <p className="text-slate-400">Join a live session or create your own hub.</p>
-                        </div>
-                        <button className="bg-[#8c25f4]/20 hover:bg-[#8c25f4]/30 text-[#8c25f4] border border-[#8c25f4]/30 px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-all">
-                            <PlusCircle className="w-5 h-5" />
-                            Create a Study Room
-                        </button>
-                    </div>
-                    <div className="bg-[#191022]/60 backdrop-blur-md rounded-xl p-8 overflow-hidden grid lg:grid-cols-12 gap-8 relative border border-white/10 group">
-                        {/* Whiteboard Visual Mockup */}
-                        <div className="lg:col-span-8 bg-black/40 rounded-lg border border-white/10 p-6 relative min-h-[400px]">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-3">
-                                    <span className="px-3 py-1 bg-[#00f2ff]/10 text-[#00f2ff] rounded-full text-xs font-bold border border-[#00f2ff]/20">LIVE</span>
-                                    <h3 className="text-xl font-bold text-white">Organic Chemistry: Molecular Bonds</h3>
-                                </div>
+                <section className="space-y-8">
+                    <ScrollReveal>
+                        <div className="flex items-end justify-between">
+                            <div>
+                                <h2 className="text-3xl font-black text-white mb-2">Virtual Study Rooms</h2>
+                                <p className="text-slate-400">Join a live session or create your own hub.</p>
                             </div>
+                            <Button variant="outline" className="bg-[#7C3AED]/10 border-[#7C3AED]/30 text-[#7C3AED] hover:bg-[#7C3AED]/20 rounded-full font-bold">
+                                <PlusCircle className="w-4 h-4 mr-2" /> Create a Study Room
+                            </Button>
                         </div>
-                        {/* Chat Sidebar Mockup */}
-                        <div className="lg:col-span-4 flex flex-col gap-4">
-                            <div className="flex-1 bg-black/20 rounded-lg border border-white/10 p-4 flex flex-col gap-4 overflow-y-auto max-h-[400px]">
-                                <div className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-[#00f2ff]/20 flex items-center justify-center text-[#00f2ff]"><Users className="w-4 h-4" /></div>
-                                    <div className="bg-[#00f2ff]/10 p-3 rounded-lg text-sm text-slate-200">
-                                        <span className="font-bold text-[#00f2ff] block mb-1">AI Moderator</span>
-                                        Who can explain why carbon forms four covalent bonds?
+                    </ScrollReveal>
+                    <ScrollReveal animation="scale-in">
+                        <div className="bg-white/[0.02] backdrop-blur-sm rounded-2xl p-8 grid lg:grid-cols-12 gap-8 border border-white/[0.06]">
+                            <div className="lg:col-span-8 bg-[#030305]/60 rounded-xl border border-white/[0.06] p-6 min-h-[350px]">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <span className="px-3 py-1 bg-[#39FF14]/10 text-[#39FF14] rounded-full text-[10px] font-black border border-[#39FF14]/20 uppercase tracking-widest">LIVE</span>
+                                    <h3 className="text-lg font-bold text-white">Organic Chemistry: Molecular Bonds</h3>
+                                </div>
+                                <div className="flex items-center justify-center h-[250px] text-slate-600 font-mono text-sm">[Interactive Whiteboard]</div>
+                            </div>
+                            <div className="lg:col-span-4 flex flex-col gap-4">
+                                <div className="flex-1 bg-[#030305]/40 rounded-xl border border-white/[0.06] p-4 flex flex-col gap-4 max-h-[350px] overflow-y-auto">
+                                    <div className="flex gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-[#00D4FF]/10 flex items-center justify-center text-[#00D4FF] shrink-0"><MessageSquare className="w-4 h-4" /></div>
+                                        <div className="bg-[#00D4FF]/5 p-3 rounded-xl text-sm text-slate-300 border border-[#00D4FF]/10">
+                                            <span className="font-bold text-[#00D4FF] block mb-1 text-xs">AI Moderator</span>
+                                            Who can explain why carbon forms four covalent bonds?
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </ScrollReveal>
                 </section>
 
                 {/* Group Challenges */}
-                <section className="space-y-12">
-                    <h2 className="text-4xl font-bold tracking-tight text-white">Group Challenges</h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {/* Challenge Cards */}
-                        <div className="bg-[#191022]/60 backdrop-blur-md p-6 rounded-xl space-y-6 hover:border-[#8c25f4]/50 transition-all cursor-pointer border border-white/10 group">
-                            <div className="h-40 rounded-lg bg-gradient-to-br from-[#8c25f4]/40 to-black overflow-hidden relative flex items-center justify-center">
-                                <Trophy className="text-white/30 w-16 h-16" />
-                            </div>
-                            <div className="space-y-2">
-                                <h3 className="text-xl font-bold text-white">The Big-O Blitz</h3>
-                                <p className="text-sm text-slate-400">Master time complexity analysis with the community.</p>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex -space-x-2">
-                                    <div className="w-8 h-8 rounded-full border-2 border-[#191022] bg-slate-800 text-[10px] flex items-center justify-center font-bold text-white">842+</div>
-                                </div>
-                                <button className="bg-[#8c25f4] group-hover:bg-[#8c25f4]/80 text-white px-6 py-2 rounded-full font-bold text-sm transition-colors">Join</button>
-                            </div>
-                        </div>
-                    </div>
+                <section className="space-y-8">
+                    <ScrollReveal>
+                        <h2 className="text-3xl font-black text-white">
+                            Group <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#00D4FF]">Challenges</span>
+                        </h2>
+                    </ScrollReveal>
+                    <StaggerContainer className="grid md:grid-cols-3 gap-6" staggerDelay={0.12}>
+                        {challenges.map((c, i) => (
+                            <StaggerItem key={i}>
+                                <motion.div
+                                    whileHover={{ y: -4 }}
+                                    className="bg-white/[0.02] backdrop-blur-sm p-6 rounded-2xl border border-white/[0.06] hover:border-[#7C3AED]/30 transition-all cursor-pointer group space-y-5"
+                                >
+                                    <div className="h-36 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${c.color}20, transparent)` }}>
+                                        <Trophy className="text-white/20 w-14 h-14" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white mb-1">{c.title}</h3>
+                                        <p className="text-sm text-slate-400">{c.desc}</p>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs text-slate-500 font-bold">{c.participants} learners</span>
+                                        <Button size="sm" className="bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] text-white rounded-full font-bold text-xs px-5 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
+                                            Join
+                                        </Button>
+                                    </div>
+                                </motion.div>
+                            </StaggerItem>
+                        ))}
+                    </StaggerContainer>
                 </section>
 
                 {/* Leaderboard */}
                 <section className="space-y-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <h2 className="text-4xl font-bold tracking-tight text-white">Global Leaderboard</h2>
-                    </div>
-                    <div className="bg-[#191022]/60 backdrop-blur-md rounded-xl overflow-hidden border border-white/10">
-                        <table className="w-full text-left">
-                            <thead className="bg-white/5 border-b border-white/10">
-                                <tr>
-                                    <th className="px-8 py-4 font-bold text-slate-400">Rank</th>
-                                    <th className="px-8 py-4 font-bold text-slate-400">Learner</th>
-                                    <th className="px-8 py-4 font-bold text-slate-400">XP Earned</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5 text-white">
-                                <tr className="hover:bg-white/5 transition-colors">
-                                    <td className="px-8 py-4 font-bold">01</td>
-                                    <td className="px-8 py-4 font-bold">Julian V.</td>
-                                    <td className="px-8 py-4 font-bold text-[#00f2ff]">12,840 XP</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <ScrollReveal>
+                        <h2 className="text-3xl font-black text-white">
+                            Global <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#00D4FF]">Leaderboard</span>
+                        </h2>
+                    </ScrollReveal>
+                    <ScrollReveal animation="scale-in">
+                        <div className="bg-white/[0.02] backdrop-blur-sm rounded-2xl overflow-hidden border border-white/[0.06]">
+                            <table className="w-full text-left">
+                                <thead className="bg-white/[0.03] border-b border-white/[0.06]">
+                                    <tr>
+                                        <th className="px-8 py-4 font-bold text-slate-400 text-sm uppercase tracking-wider">Rank</th>
+                                        <th className="px-8 py-4 font-bold text-slate-400 text-sm uppercase tracking-wider">Learner</th>
+                                        <th className="px-8 py-4 font-bold text-slate-400 text-sm uppercase tracking-wider">XP Earned</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/[0.04]">
+                                    {leaderboard.map((entry, i) => (
+                                        <motion.tr
+                                            key={i}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: i * 0.1 }}
+                                            className="hover:bg-white/[0.02] transition-colors"
+                                        >
+                                            <td className="px-8 py-5 font-black text-white">{entry.rank}</td>
+                                            <td className="px-8 py-5 font-bold text-white">{entry.name}</td>
+                                            <td className="px-8 py-5 font-bold" style={{ color: entry.color }}>{entry.xp}</td>
+                                        </motion.tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </ScrollReveal>
                 </section>
-            </main>
+            </div>
         </div>
     );
 }
-

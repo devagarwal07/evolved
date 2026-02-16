@@ -1,92 +1,178 @@
 "use client";
 
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
-import { Play, ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles, Users, BookOpen, Zap } from "lucide-react";
+import Link from "next/link";
+import { ROUTES } from "@/lib/routes";
+
+const FloatingBrain = dynamic(
+    () => import("@/components/marketing/3d/FloatingBrain").then((m) => m.FloatingBrain),
+    { ssr: false, loading: () => <div className="w-full h-[450px] flex items-center justify-center"><div className="w-32 h-32 rounded-full bg-primary/20 blur-[60px] animate-pulse" /></div> }
+);
+
+const ParticleField = dynamic(
+    () => import("@/components/marketing/3d/ParticleField").then((m) => m.ParticleField),
+    { ssr: false }
+);
+
+const stats = [
+    { icon: Users, label: "Active Learners", value: "10K+" },
+    { icon: BookOpen, label: "Topics Covered", value: "200+" },
+    { icon: Zap, label: "AI-Powered", value: "24/7" },
+];
 
 export function HeroSection() {
     return (
-        <section className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center mb-32 pt-32 relative">
-            <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-            >
-                <motion.span
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold mb-6 shadow-lg shadow-primary/10"
-                >
-                    Next-Gen Learning
-                </motion.span>
-                <h1 className="text-6xl font-bold leading-tight mb-6 text-white">
-                    Meet Your Personal <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-secondary animate-gradient-text bg-300% drop-shadow-[0_0_30px_rgba(139,92,246,0.3)]">
-                        AI Tutor
-                    </span>
-                </h1>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4, duration: 0.8 }}
-                    className="text-xl text-slate-400 mb-8 max-w-lg leading-relaxed"
-                >
-                    EvolveEd adapts in real-time to your unique cognitive patterns, bridging the gap between confusion and mastery with precision guidance.
-                </motion.p>
-                <div className="flex items-center gap-4">
-                    <Button
-                        size="lg"
-                        className="bg-primary hover:bg-primary/90 text-white rounded-full font-bold shadow-[0_0_30px_rgba(192,37,244,0.4)] hover:shadow-[0_0_50px_rgba(192,37,244,0.6)] px-8 py-6 text-base group transition-all duration-300 hover:scale-105"
-                    >
-                        Start Learning Now
-                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="lg"
-                        className="rounded-full px-8 py-6 text-base font-semibold border-white/10 hover:bg-white/5 text-white hover:text-white transition-all bg-white/[0.03] backdrop-blur-sm group hover:border-white/20"
-                    >
-                        <Play className="w-4 h-4 mr-2 fill-current group-hover:scale-110 transition-transform" />
-                        Watch Demo
-                    </Button>
-                </div>
-            </motion.div>
+        <section className="relative min-h-screen flex items-center overflow-hidden">
+            {/* Particle Background */}
+            <ParticleField className="z-0 opacity-60" />
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative"
-            >
+            {/* Gradient mesh orbs */}
+            <div className="absolute inset-0 pointer-events-none z-0">
                 <motion.div
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.25, 0.15] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -inset-4 bg-primary/20 blur-[100px] rounded-full"
+                    className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#7C3AED] rounded-full blur-[200px]"
                 />
-                <div className="relative glass-card rounded-xl overflow-hidden border border-white/10 shadow-2xl group hover:border-primary/30 transition-all duration-500">
-                    <img
-                        className="w-full h-[400px] object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700"
-                        alt="Futuristic AI interface with glowing data nodes"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuANfq3fAnAMj4i6DLlMzefR2RMmfeEMKME_0AYqTqiaZH8z50vXKHAi2qyo73XcV3W5Jj7-iPEsCVMadLxWXLD3ipg7SD7UcOkLX4vPzD998IKg7Usw4vQOlYqWWNhCci8Kme9q6xtE92ziPFfWMPQyqRMejAX7EtdxJQH9r-vcagydwLFH32hAG-7A1sLOHxYKjPWlaE-UU2k7QHxPwN5i_Se0qSda1liTa53p0aywAA4iQpbMOK3ERM0w0Bz_kjfJ0rQp6w3-7EJF"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#050507] to-transparent" />
-                    <div className="absolute bottom-8 left-8 right-8">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                            <span className="text-sm font-mono text-slate-300 tracking-widest uppercase text-xs">System Online: Analyzing Retention</span>
-                        </div>
-                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                <motion.div
+                    animate={{ scale: [1.2, 1, 1.2], opacity: [0.1, 0.2, 0.1] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                    className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-[#00D4FF] rounded-full blur-[200px]"
+                />
+                <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#39FF14] rounded-full blur-[200px] opacity-[0.05]"
+                />
+            </div>
+
+            {/* Animated grid background */}
+            <div
+                className="absolute inset-0 z-0 opacity-[0.04]"
+                style={{
+                    backgroundImage: `linear-gradient(rgba(124, 58, 237, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 58, 237, 0.3) 1px, transparent 1px)`,
+                    backgroundSize: "60px 60px",
+                }}
+            />
+
+            <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10 pt-32 pb-16">
+                {/* Left: Text */}
+                <div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="flex items-center gap-2 mb-8"
+                    >
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#7C3AED]/15 to-[#00D4FF]/15 border border-[#7C3AED]/30 text-sm font-semibold text-[#00D4FF] shadow-[0_0_30px_rgba(124,58,237,0.15)]">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            Next-Gen AI Learning Platform
+                        </span>
+                    </motion.div>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                        className="text-5xl md:text-7xl font-black leading-[1.05] mb-6 tracking-tight"
+                    >
+                        <span className="text-white">Learn </span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#00D4FF] animate-gradient-shift bg-[length:200%_auto]">
+                            Smarter
+                        </span>
+                        <br />
+                        <span className="text-white">with </span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00D4FF] via-[#39FF14] to-[#00D4FF] animate-gradient-shift bg-[length:200%_auto]">
+                            AI Power
+                        </span>
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.25 }}
+                        className="text-lg md:text-xl text-slate-400 mb-10 max-w-lg leading-relaxed"
+                    >
+                        EvolveEd adapts to your cognitive patterns in real-time,
+                        building personalized paths from confusion to mastery with
+                        precision AI guidance.
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.35 }}
+                        className="flex flex-wrap items-center gap-4"
+                    >
+                        <Button
+                            asChild
+                            size="lg"
+                            className="relative bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] text-white rounded-full font-bold px-8 py-6 text-base group transition-all duration-300 hover:scale-105 shadow-[0_0_40px_rgba(124,58,237,0.4)] hover:shadow-[0_0_60px_rgba(124,58,237,0.6)] overflow-hidden"
+                        >
+                            <Link href={ROUTES.AUTH.SIGNUP}>
+                                <span className="relative z-10 flex items-center gap-2">
+                                    Start Learning Free
+                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </span>
+                            </Link>
+                        </Button>
+                        <Button
+                            asChild
+                            variant="outline"
+                            size="lg"
+                            className="rounded-full px-8 py-6 text-base font-semibold border-white/10 hover:bg-white/5 text-white hover:text-white transition-all bg-white/[0.03] backdrop-blur-sm group hover:border-[#00D4FF]/30 hover:shadow-[0_0_30px_rgba(0,212,255,0.1)]"
+                        >
+                            <Link href={ROUTES.AUTH.LOGIN}>
+                                <span className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-[#39FF14] shadow-[0_0_10px_rgba(57,255,20,0.5)] animate-pulse" />
+                                    Log In
+                                </span>
+                            </Link>
+                        </Button>
+                    </motion.div>
+
+                    {/* Stats */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                        className="flex gap-8 mt-12 pt-8 border-t border-white/5"
+                    >
+                        {stats.map((stat, i) => (
                             <motion.div
-                                initial={{ width: "0%" }}
-                                animate={{ width: "66%" }}
-                                transition={{ duration: 2, delay: 1, ease: "easeOut" }}
-                                className="h-full bg-primary animate-pulse"
-                            />
-                        </div>
-                    </div>
+                                key={i}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 + i * 0.1 }}
+                                className="flex items-center gap-3"
+                            >
+                                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                    <stat.icon className="w-4 h-4 text-[#00D4FF]" />
+                                </div>
+                                <div>
+                                    <div className="text-lg font-black text-white">{stat.value}</div>
+                                    <div className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">{stat.label}</div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 </div>
-            </motion.div>
+
+                {/* Right: 3D Brain */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1, delay: 0.3 }}
+                    className="relative"
+                >
+                    <FloatingBrain />
+                </motion.div>
+            </div>
+
+            {/* Bottom gradient fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#030305] to-transparent z-10" />
         </section>
     );
 }

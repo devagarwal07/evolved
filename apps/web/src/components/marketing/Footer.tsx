@@ -7,7 +7,7 @@ import { ROUTES } from "@/lib/routes";
 
 export function Footer() {
     return (
-        <footer className="bg-[#050507] border-t border-white/[0.08] pt-24 pb-12 px-6 relative overflow-hidden">
+        <footer className="border-t border-white/[0.08] pt-24 pb-12 px-6 relative overflow-hidden">
             {/* Background Accent */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
 

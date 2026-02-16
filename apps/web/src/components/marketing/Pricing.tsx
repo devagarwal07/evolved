@@ -1,5 +1,9 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { ScrollReveal, StaggerContainer, StaggerItem } from "./ScrollReveal";
 
 const plans = [
     {
@@ -9,7 +13,7 @@ const plans = [
         features: ["5 AI Tutor credits / mo", "Basic Learning Paths", "Community Access"],
         cta: "Start Free",
         popular: false,
-        gradient: "",
+        color: "#94a3b8",
     },
     {
         name: "Evolver",
@@ -23,7 +27,7 @@ const plans = [
         ],
         cta: "Get Pro",
         popular: true,
-        gradient: "border-primary shadow-primary/20",
+        color: "#7C3AED",
     },
     {
         name: "Master",
@@ -36,74 +40,76 @@ const plans = [
         ],
         cta: "Go Premium",
         popular: false,
-        gradient: "",
+        color: "#00D4FF",
     },
 ];
 
 export function Pricing() {
     return (
-        <section className="py-32 px-6 bg-background relative" id="pricing">
+        <section className="py-32 px-6 relative" id="pricing">
             {/* Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#7C3AED]/5 rounded-full blur-[200px] pointer-events-none" />
 
             <div className="max-w-7xl mx-auto relative z-10">
-                <div className="text-center mb-20">
-                    <h2 className="text-4xl font-black mb-6 text-white">
-                        Transparent Pricing
+                <ScrollReveal className="text-center mb-20">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
+                        💎 Pricing
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-black mb-4 text-white">
+                        Transparent <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#00D4FF]">Pricing</span>
                     </h2>
-                    <p className="text-muted-foreground text-lg">
+                    <p className="text-slate-400 text-lg">
                         Choose the path that fits your ambition.
                     </p>
-                </div>
+                </ScrollReveal>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6" staggerDelay={0.15}>
                     {plans.map((plan, i) => (
-                        <div
-                            key={i}
-                            className={`relative bg-card/60 backdrop-blur-xl p-8 rounded-3xl border border-border/50 flex flex-col h-full hover:border-primary/30 transition-all ${plan.popular ? `border-primary shadow-2xl ${plan.gradient}` : ""
-                                }`}
-                        >
-                            {plan.popular && (
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
-                                    Most Popular
-                                </div>
-                            )}
-
-                            <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                            <div className="flex items-baseline mb-8">
-                                <span className="text-5xl font-black text-white">
-                                    {plan.price}
-                                </span>
-                                <span className="text-muted-foreground ml-2 font-medium">
-                                    {plan.frequency}
-                                </span>
-                            </div>
-
-                            <ul className="space-y-4 mb-12 flex-grow">
-                                {plan.features.map((feature, j) => (
-                                    <li key={j} className="flex items-start gap-3 text-slate-300">
-                                        <CheckCircle2
-                                            className={`w-5 h-5 shrink-0 ${plan.popular ? "text-primary" : "text-muted-foreground"
-                                                }`}
-                                        />
-                                        <span className="text-sm leading-tight">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <Button
-                                size="lg"
-                                variant={plan.popular ? "default" : "outline"}
-                                className={`w-full rounded-full font-bold py-6 text-base ${plan.popular
-                                        ? "shadow-lg shadow-primary/25 hover:shadow-primary/50"
-                                        : "bg-transparent border-white/10 hover:bg-white/5 hover:text-white"
+                        <StaggerItem key={i}>
+                            <motion.div
+                                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                                className={`relative bg-white/[0.02] backdrop-blur-sm p-8 rounded-2xl border flex flex-col h-full transition-all duration-500 ${plan.popular
+                                    ? "border-[#7C3AED]/50 shadow-[0_0_40px_rgba(124,58,237,0.15)]"
+                                    : "border-white/[0.06] hover:border-white/[0.12]"
                                     }`}
                             >
-                                {plan.cta}
-                            </Button>
-                        </div>
+                                {plan.popular && (
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] text-white text-[10px] font-black uppercase tracking-widest px-5 py-1.5 rounded-full shadow-[0_0_20px_rgba(124,58,237,0.4)]">
+                                        Most Popular
+                                    </div>
+                                )}
+
+                                <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                                <div className="flex items-baseline mb-8">
+                                    <span className="text-5xl font-black text-white">{plan.price}</span>
+                                    <span className="text-slate-500 ml-2 font-medium">{plan.frequency}</span>
+                                </div>
+
+                                <ul className="space-y-4 mb-12 flex-grow">
+                                    {plan.features.map((feature, j) => (
+                                        <li key={j} className="flex items-start gap-3 text-slate-300">
+                                            <CheckCircle2
+                                                className="w-5 h-5 shrink-0"
+                                                style={{ color: plan.popular ? "#7C3AED" : "#64748b" }}
+                                            />
+                                            <span className="text-sm leading-tight">{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <Button
+                                    size="lg"
+                                    className={`w-full rounded-full font-bold py-6 text-base transition-all ${plan.popular
+                                        ? "bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] text-white shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] hover:scale-105"
+                                        : "bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] hover:scale-105"
+                                        }`}
+                                >
+                                    {plan.cta}
+                                </Button>
+                            </motion.div>
+                        </StaggerItem>
                     ))}
-                </div>
+                </StaggerContainer>
             </div>
         </section>
     );

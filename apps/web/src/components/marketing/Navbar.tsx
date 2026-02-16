@@ -8,7 +8,7 @@ import { ROUTES } from "@/lib/routes";
 export function Navbar() {
     return (
         <nav className="fixed top-6 left-0 right-0 z-50 flex justify-center px-6 pointer-events-none">
-            <div className="pointer-events-auto bg-[#050507]/80 backdrop-blur-xl max-w-7xl w-full px-6 py-4 rounded-full flex justify-between items-center border border-white/[0.08] shadow-2xl shadow-black/50">
+            <div className="pointer-events-auto bg-[#030305]/80 backdrop-blur-xl max-w-7xl w-full px-6 py-4 rounded-full flex justify-between items-center border border-white/[0.08] shadow-2xl shadow-black/50">
                 {/* Logo */}
                 <Link href={ROUTES.HOME} className="flex items-center gap-3 group">
                     <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:scale-105 transition-transform">

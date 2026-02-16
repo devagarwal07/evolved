@@ -6,16 +6,16 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* ─── Unified Color System ─── */
-  --color-background: #050507;
+  /* ─── Unified Color System (Student-Friendly Futuristic) ─── */
+  --color-background: #030305;
   --color-foreground: #f0f0f5;
   --color-card: rgba(255, 255, 255, 0.03);
   --color-card-foreground: #f0f0f5;
   --color-popover: rgba(255, 255, 255, 0.05);
   --color-popover-foreground: #f0f0f5;
-  --color-primary: #8B5CF6;
+  --color-primary: #7C3AED;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #06B6D4;
+  --color-secondary: #00D4FF;
   --color-secondary-foreground: #ffffff;
   --color-muted: rgba(255, 255, 255, 0.06);
   --color-muted-foreground: #94a3b8;
@@ -25,14 +25,18 @@
   --color-destructive-foreground: #ffffff;
   --color-border: rgba(255, 255, 255, 0.08);
   --color-input: rgba(255, 255, 255, 0.08);
-  --color-ring: #8B5CF6;
+  --color-ring: #7C3AED;
+
+  /* ─── Accent Colors ─── */
+  --color-neon-green: #39FF14;
+  --color-electric-cyan: #00D4FF;
 
   /* ─── Gamification Colors ─── */
-  --color-xp: #06B6D4;
+  --color-xp: #00D4FF;
   --color-streak: #f97316;
   --color-success: #10b981;
   --color-warning: #eab308;
-  --color-level: #8B5CF6;
+  --color-level: #7C3AED;
 
   --radius: 1rem;
 }
@@ -44,7 +48,7 @@
 
 body,
 html {
-  background-color: #050507;
+  background-color: #030305;
   color: var(--color-foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   min-height: 100vh;
@@ -70,11 +74,11 @@ html {
 
 /* ─── Glow Effects ─── */
 .glow-primary {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
 }
 
 .glow-secondary {
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
 }
 
 .glow-success {
@@ -85,34 +89,64 @@ html {
   box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
 }
 
+.glow-neon {
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+}
+
 /* ─── Text Gradients ─── */
 .text-gradient-primary {
-  background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+  background: linear-gradient(135deg, #7C3AED, #00D4FF);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-brand {
-  background: linear-gradient(135deg, #8B5CF6, #a78bfa, #06B6D4);
+  background: linear-gradient(135deg, #7C3AED, #a78bfa, #00D4FF);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+.text-gradient-neon {
+  background: linear-gradient(135deg, #00D4FF, #39FF14);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Animated Gradient Shift ─── */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 4s ease infinite;
+}
+
 /* ─── Gamification UI ─── */
 .xp-bar {
   height: 6px;
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(0, 212, 255, 0.15);
   border-radius: 999px;
   overflow: hidden;
 }
 
 .xp-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #06B6D4, #8B5CF6);
+  background: linear-gradient(90deg, #00D4FF, #7C3AED);
   border-radius: 999px;
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -123,9 +157,9 @@ html {
 }
 
 .level-badge {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.05));
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  color: #8B5CF6;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(124, 58, 237, 0.05));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #7C3AED;
 }
 
 /* ─── Animated Orbs ─── */
@@ -161,11 +195,22 @@ html {
 }
 
 .orb-primary {
-  background: rgba(139, 92, 246, 0.35);
+  background: rgba(124, 58, 237, 0.35);
 }
 
 .orb-secondary {
-  background: rgba(6, 182, 212, 0.35);
+  background: rgba(0, 212, 255, 0.35);
+}
+
+/* ─── Animated Gradient Border ─── */
+@keyframes border-rotate {
+  0% {
+    --angle: 0deg;
+  }
+
+  100% {
+    --angle: 360deg;
+  }
 }
 
 /* ─── Pill Input Pattern ─── */
@@ -185,8 +230,8 @@ html {
 
 .pill-input:focus {
   outline: none;
-  border-color: #8B5CF6;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+  border-color: #7C3AED;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
 }
 
 /* ─── Scrollbar ─── */
@@ -205,4 +250,9 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Smooth Scroll ─── */
+html {
+  scroll-behavior: smooth;
 }

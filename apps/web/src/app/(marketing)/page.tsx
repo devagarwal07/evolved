@@ -8,7 +8,7 @@ import { CtaSection } from "@/components/marketing/landing/CtaSection";
 
 export default function LandingPage() {
     return (
-        <div className="bg-[#050507] min-h-screen text-slate-100 font-sans selection:bg-primary/30">
+        <div className="bg-[#030305] min-h-screen text-slate-100 font-sans selection:bg-primary/30">
             <HeroSection />
             <WorkspaceSection />
             <CoreCapabilities />

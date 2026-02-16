@@ -1,100 +1,89 @@
-
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { Mail, MapPin, Phone, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollReveal } from "@/components/marketing/ScrollReveal";
+
+const contactInfo = [
+    { icon: Mail, title: "Email Us", value: "support@evolveed.ai", color: "#7C3AED" },
+    { icon: MapPin, title: "Visit Us", value: "123 Innovation Dr, Tech City, CA", color: "#00D4FF" },
+    { icon: Phone, title: "Call Us", value: "+1 (555) 123-4567", color: "#39FF14" },
+];
 
 export default function ContactPage() {
     return (
-        <div className="min-h-screen bg-black text-white pt-32 pb-20 px-6">
+        <div className="pt-32 pb-20 px-6">
             <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-
-                {/* Left Column - Info */}
-                <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    <div className="inline-flex items-center justify-center p-3 mb-6 bg-pink-500/10 rounded-2xl border border-pink-500/20">
-                        <Mail className="w-8 h-8 text-pink-500" />
+                {/* Left */}
+                <ScrollReveal animation="fade-left">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-[#00D4FF] uppercase tracking-widest mb-6">
+                        <Sparkles className="w-3 h-3" /> Get in Touch
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight">
-                        Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">Touch</span>
+                    <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight text-white">
+                        Get in{" "}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#A855F7]">
+                            Touch
+                        </span>
                     </h1>
                     <p className="text-xl text-slate-400 mb-12 leading-relaxed">
-                        Have questions about EvolveEd? We'd love to hear from you. Fill out the form and we'll be in touch shortly.
+                        Have questions about EvolveEd? We&apos;d love to hear from you. Fill out the form and we&apos;ll be in touch shortly.
                     </p>
 
-                    <div className="space-y-8">
-                        <div className="flex items-center gap-6">
-                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                                <Mail className="w-5 h-5 text-pink-500" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-white">Email Us</h3>
-                                <p className="text-slate-400">support@evolveed.ai</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                                <MapPin className="w-5 h-5 text-purple-500" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-white">Visit Us</h3>
-                                <p className="text-slate-400">123 Innovation Dr, Tech City, CA</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                                <Phone className="w-5 h-5 text-blue-500" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-white">Call Us</h3>
-                                <p className="text-slate-400">+1 (555) 123-4567</p>
-                            </div>
-                        </div>
+                    <div className="space-y-6">
+                        {contactInfo.map((info, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, x: -20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                                className="flex items-center gap-5"
+                            >
+                                <div className="w-12 h-12 rounded-full bg-white/[0.03] flex items-center justify-center border border-white/[0.06]">
+                                    <info.icon className="w-5 h-5" style={{ color: info.color }} />
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-bold text-white">{info.title}</h3>
+                                    <p className="text-slate-400 text-sm">{info.value}</p>
+                                </div>
+                            </motion.div>
+                        ))}
                     </div>
-                </motion.div>
+                </ScrollReveal>
 
-                {/* Right Column - Form */}
-                <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden"
-                >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+                {/* Right - Form */}
+                <ScrollReveal animation="fade-right" delay={0.2}>
+                    <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#7C3AED]/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-                    <form className="space-y-6 relative z-10">
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">First Name</label>
-                                <Input className="bg-black/40 border-white/10 focus:border-pink-500" placeholder="Jane" />
+                        <form className="space-y-6 relative z-10">
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">First Name</label>
+                                    <Input className="bg-[#030305]/60 border-white/[0.06] focus:border-[#7C3AED]/50 rounded-xl text-white" placeholder="Jane" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Last Name</label>
+                                    <Input className="bg-[#030305]/60 border-white/[0.06] focus:border-[#7C3AED]/50 rounded-xl text-white" placeholder="Doe" />
+                                </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">Last Name</label>
-                                <Input className="bg-black/40 border-white/10 focus:border-pink-500" placeholder="Doe" />
+                                <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Email Address</label>
+                                <Input className="bg-[#030305]/60 border-white/[0.06] focus:border-[#7C3AED]/50 rounded-xl text-white" placeholder="jane@example.com" />
                             </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">Email Address</label>
-                            <Input className="bg-black/40 border-white/10 focus:border-pink-500" placeholder="jane@example.com" />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">Message</label>
-                            <Textarea className="bg-black/40 border-white/10 focus:border-pink-500 min-h-[150px]" placeholder="Tell us how we can help..." />
-                        </div>
-
-                        <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold py-6 rounded-xl shadow-lg shadow-pink-500/20">
-                            Send Message <Send className="w-4 h-4 ml-2" />
-                        </Button>
-                    </form>
-                </motion.div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Message</label>
+                                <Textarea className="bg-[#030305]/60 border-white/[0.06] focus:border-[#7C3AED]/50 min-h-[150px] rounded-xl text-white" placeholder="Tell us how we can help..." />
+                            </div>
+                            <Button className="w-full bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] text-white font-black py-6 rounded-xl shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:shadow-[0_0_50px_rgba(124,58,237,0.5)] transition-all hover:scale-[1.02]">
+                                Send Message <Send className="w-4 h-4 ml-2" />
+                            </Button>
+                        </form>
+                    </div>
+                </ScrollReveal>
             </div>
         </div>
     );
