@@ -1,40 +1,58 @@
-
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { TutorSession, TutorMessage, Prisma } from '@prisma/client';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const SYSTEM_PROMPT = `You are **EvolveEd AI Tutor** — a world-class, patient, and adaptive learning mentor built into the EvolveEd platform.
+
+Your behavior:
+- **Be a tutor, not a search engine.** Don't just give answers — teach the concept step by step. Ask follow-up questions to check understanding.
+- **Use markdown formatting.** Use **bold**, *italics*, \`code blocks\`, numbered lists, bullet points, headers (##), and tables to structure your responses. Use \`\`\` for code examples.
+- **Be encouraging but honest.** Celebrate progress ("Great question!"), but don't lie about correctness.
+- **Adapt to the topic.** If the topic is programming, include code examples. If it's science, include formulas and diagrams described in text. If it's history, provide timelines.
+- **Keep responses focused.** Aim for 200–400 words unless the student asks for a deep dive. Break complex topics into digestible chunks.
+- **Ask follow-up questions.** End responses with a question to keep the conversation going and check comprehension, e.g., "Does that make sense? Want me to explain the next step?"
+- **Use examples and analogies.** Make abstract concepts concrete with real-world examples.
+- **When the student is confused, try a different approach.** Explain using analogies, visual descriptions, or simpler language.
+
+You are NOT a general-purpose chatbot. You only help with learning and education topics. If asked unrelated questions, politely redirect: "I'm your learning tutor! Let's focus on your studies. What topic can I help you with?"`;
 
 @Injectable()
 export class TutorService {
-    private genAI: GoogleGenerativeAI;
-    private model: any;
+    private readonly logger = new Logger(TutorService.name);
+    private genAI: GoogleGenerativeAI | null = null;
+    private model: any = null;
 
     constructor(private prisma: PrismaService) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
             this.genAI = new GoogleGenerativeAI(apiKey);
-            this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+            this.model = this.genAI.getGenerativeModel({
+                model: 'gemini-2.0-flash',
+                systemInstruction: SYSTEM_PROMPT,
+            });
+            this.logger.log('Gemini AI initialized successfully');
         } else {
-            console.warn("GEMINI_API_KEY not found in environment variables. AI Tutor will use mock responses.");
+            this.logger.warn('GEMINI_API_KEY not found. AI Tutor will use mock responses.');
         }
     }
 
     async createSession(userId: string, topic: string) {
-        return this.prisma.tutorSession.create({
+        const session = await this.prisma.tutorSession.create({
             data: {
                 userId,
                 topic,
                 messages: {
                     create: {
                         role: 'assistant',
-                        content: `Hello! I'm your AI Tutor for ${topic}. I can help you understand concepts, practice problems, or prepare for exams. How would you like to start?`,
-                    }
-                }
+                        content: `# Welcome to your ${topic} session! 🎓\n\nI'm your **EvolveEd AI Tutor**, and I'm here to help you master **${topic}**.\n\nI can help you with:\n- 📖 **Explaining concepts** step by step\n- 🧪 **Practice problems** and worked examples\n- 🎯 **Exam preparation** and key topics\n- 🤔 **Clearing doubts** on anything you're stuck on\n\n**Where would you like to start?** Tell me what you already know, or ask me anything!`,
+                    },
+                },
             },
             include: {
                 messages: true,
             },
         });
+        return session;
     }
 
     async getSessions(userId: string) {
@@ -44,125 +62,152 @@ export class TutorService {
             include: {
                 messages: {
                     take: 1,
-                    orderBy: { createdAt: 'desc' }
-                }
-            }
+                    orderBy: { createdAt: 'desc' },
+                },
+            },
         });
     }
 
     async getSession(id: string, userId: string) {
-        return this.prisma.tutorSession.findFirst({
+        const session = await this.prisma.tutorSession.findFirst({
             where: { id, userId },
             include: {
                 messages: {
-                    orderBy: { createdAt: 'asc' }
-                }
-            }
+                    orderBy: { createdAt: 'asc' },
+                },
+            },
         });
+
+        if (!session) {
+            throw new NotFoundException('Session not found');
+        }
+
+        return session;
+    }
+
+    async deleteSession(id: string, userId: string) {
+        const session = await this.prisma.tutorSession.findFirst({
+            where: { id, userId },
+        });
+
+        if (!session) {
+            throw new NotFoundException('Session not found');
+        }
+
+        // Delete messages first (cascade should handle this, but being explicit)
+        await this.prisma.tutorMessage.deleteMany({
+            where: { sessionId: id },
+        });
+
+        await this.prisma.tutorSession.delete({
+            where: { id },
+        });
+
+        return { message: 'Session deleted successfully' };
     }
 
     async sendMessage(sessionId: string, userId: string, content: string) {
-        // 1. Verify ownership
+        // 1. Verify session ownership
         const session = await this.prisma.tutorSession.findFirst({
-            where: { id: sessionId, userId }
+            where: { id: sessionId, userId },
         });
 
-        if (!session) throw new Error('Session not found');
+        if (!session) {
+            throw new NotFoundException('Session not found');
+        }
 
-        // 2. Save User Message
+        // 2. Save user message
         const userMessage = await this.prisma.tutorMessage.create({
             data: {
                 sessionId,
                 role: 'user',
                 content,
-            }
+            },
         });
 
-        // 3. Generate AI Response
-        let aiResponseContent = "";
+        // 3. Generate AI response
+        let aiResponseContent = '';
 
         if (this.model) {
-            try {
-                // Fetch previous messages for context
-                const history = await this.prisma.tutorMessage.findMany({
-                    where: {
-                        sessionId,
-                        id: { not: userMessage.id }
-                    },
-                    orderBy: { createdAt: 'asc' },
-                    take: 50
-                });
+            // Fetch previous messages for context
+            const history = await this.prisma.tutorMessage.findMany({
+                where: {
+                    sessionId,
+                    id: { not: userMessage.id },
+                },
+                orderBy: { createdAt: 'asc' },
+                take: 50,
+            });
 
-                // Sanitize history: Merge consecutive messages from same role
-                const sanitizedHistory = [];
-                let lastRole = null;
+            try {
+                // Sanitize history: merge consecutive messages from same role
+                const sanitizedHistory: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+                let lastRole: string | null = null;
 
                 for (const msg of history) {
                     const role = msg.role === 'assistant' ? 'model' : 'user';
 
                     if (role === lastRole && sanitizedHistory.length > 0) {
-                        // Merge with previous
-                        sanitizedHistory[sanitizedHistory.length - 1].parts[0].text += "\n" + msg.content;
+                        sanitizedHistory[sanitizedHistory.length - 1].parts[0].text += '\n' + msg.content;
                     } else {
-                        // Add new
                         sanitizedHistory.push({
-                            role: role,
-                            parts: [{ text: msg.content }]
+                            role,
+                            parts: [{ text: msg.content }],
                         });
                         lastRole = role;
                     }
                 }
 
-                // Gemini requirement: History must start with 'user'
+                // Gemini requirement: history must start with 'user'
                 if (sanitizedHistory.length > 0 && sanitizedHistory[0].role === 'model') {
                     sanitizedHistory.unshift({
                         role: 'user',
-                        parts: [{ text: `I want to start a session about ${session.topic}.` }]
+                        parts: [{ text: `I want to learn about ${session.topic}.` }],
                     });
                 }
-
-                try {
-                    const fs = require('fs');
-                    fs.writeFileSync('d:\\evolveed\\evolve-v1\\apps\\api\\history_dump.json', JSON.stringify(sanitizedHistory, null, 2));
-                } catch (e) { console.error("Failed to write log", e); }
 
                 const chat = this.model.startChat({
                     history: sanitizedHistory,
                     generationConfig: {
-                        maxOutputTokens: 1000,
+                        maxOutputTokens: 2048,
                     },
                 });
 
                 const result = await chat.sendMessage(content);
                 const response = await result.response;
                 aiResponseContent = response.text();
-
             } catch (error) {
-                console.error("Gemini API Error:", error);
-                // Log to file for debugging
-                const fs = require('fs');
-                const logData = `[${new Date().toISOString()}] Error: ${error}\nHistory: ${JSON.stringify(history, null, 2)}\n\n`;
-                fs.appendFileSync('d:\\evolveed\\evolve-v1\\api-error.log', logData);
+                const errMsg = (error as Error).message || String(error);
+                this.logger.error(`Gemini API Error: ${errMsg}`, (error as Error).stack);
 
-                aiResponseContent = "I'm having trouble connecting to my knowledge base right now. Please try again in a moment. (Error logged)";
+                if (errMsg.includes('429')) {
+                    aiResponseContent =
+                        "⚠️ **Rate limit reached.** The AI service quota has been exceeded. Please wait a minute and try again, or update your API key in the `.env` file.";
+                } else if (errMsg.includes('404')) {
+                    aiResponseContent =
+                        "⚠️ **Model not found.** The configured AI model isn't available. Please check the model name in the tutor service.";
+                } else {
+                    aiResponseContent =
+                        `⚠️ **AI service error:** ${errMsg.substring(0, 200)}\n\nPlease try again in a moment.`;
+                }
             }
         } else {
-            aiResponseContent = `[MOCK] That's an interesting point about "${content}". I'm running in mock mode. Please configure GEMINI_API_KEY.`;
+            aiResponseContent = `I'm currently in **demo mode** because the AI service isn't configured.\n\nYour question about *"${content}"* is great! Once the AI service is active, I'll be able to give you a detailed, personalized answer.\n\n> **Tip:** Ask your administrator to configure the \`GEMINI_API_KEY\` environment variable.`;
         }
 
-        // 4. Save AI Response
+        // 4. Save AI response
         const aiMessage = await this.prisma.tutorMessage.create({
             data: {
                 sessionId,
                 role: 'assistant',
                 content: aiResponseContent,
-            }
+            },
         });
 
-        // Update session timestamp
+        // 5. Update session timestamp
         await this.prisma.tutorSession.update({
             where: { id: sessionId },
-            data: { updatedAt: new Date() }
+            data: { updatedAt: new Date() },
         });
 
         return aiMessage;

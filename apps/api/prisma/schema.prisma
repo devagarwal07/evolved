@@ -55,6 +55,7 @@ model User {
   flashcardDecks FlashcardDeck[]
   quizAttempts  QuizAttempt[]
   roomMemberships RoomMember[]
+  goals           UserGoal[]
 
   @@map("users")
 }
@@ -213,4 +214,20 @@ model RoomMember {
   joinedAt DateTime  @default(now())
 
   @@map("room_members")
+}
+
+// ─── Goals ──────────────────────────────────────────────
+
+model UserGoal {
+  id          String    @id @default(cuid())
+  name        String
+  targetDate  DateTime?
+  progress    Float     @default(0)
+  status      String    @default("active") // active, completed, paused
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("user_goals")
 }

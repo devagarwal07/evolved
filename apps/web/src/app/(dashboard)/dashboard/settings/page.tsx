@@ -27,7 +27,7 @@ export default function SettingsPage() {
         setIsSaving(true);
         try {
             // Call API to update user
-            await api.patch(`/users/${user?.id}`, { name, bio });
+            await api.patch("/users/me", { name, bio });
             updateUser({ name, bio });
             // Show success toast (mock)
             alert("Profile updated!");

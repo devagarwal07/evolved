@@ -15,7 +15,6 @@ export class DashboardService {
                 xp: true,
                 streak: true,
                 role: true,
-                // Add more fields if needed
             }
         });
 
@@ -30,34 +29,73 @@ export class DashboardService {
             }
         });
 
+        // Real learning path data
+        const activePaths = await this.prisma.learningPath.findMany({
+            where: { userId },
+            take: 3,
+            orderBy: { updatedAt: 'desc' },
+            include: {
+                nodes: {
+                    orderBy: [{ phase: 'asc' }, { order: 'asc' }],
+                },
+            },
+        });
+
+        const pathsWithMeta = activePaths.map(path => {
+            const totalNodes = path.nodes.length;
+            const completedNodes = path.nodes.filter(n => n.status === 'COMPLETED').length;
+            const activeNode = path.nodes.find(n => n.status === 'ACTIVE');
+            const activePhase = activeNode
+                ? ((path.phases as any)?.phases || []).find((p: any) => p.phase === activeNode.phase)
+                : null;
+
+            return {
+                id: path.id,
+                topic: path.topic,
+                goal: path.goal,
+                progress: path.progress,
+                totalNodes,
+                completedNodes,
+                currentPhase: activePhase?.title || 'Getting Started',
+                currentNode: activeNode?.title || null,
+                updatedAt: path.updatedAt,
+            };
+        });
+
+        // Real stats
+        const totalPaths = await this.prisma.learningPath.count({ where: { userId } });
+        const totalNodesCompleted = await this.prisma.pathNode.count({
+            where: { path: { userId }, status: 'COMPLETED' },
+        });
+        const totalNotes = await this.prisma.note.count({ where: { userId } });
+
         return {
             user,
             stats: {
-                coursesCompleted: 0, // Mock for now
-                hoursLearned: 12.5,  // Mock for now
+                totalPaths,
+                totalNodesCompleted,
+                totalNotes,
+                hoursLearned: Math.round(totalNodesCompleted * 2.5 * 10) / 10, // estimate ~2.5h per node
             },
             recentActivity,
-            recommended: [
-                { title: "Advanced React Patterns", type: "course", progress: 0 },
-                { title: "System Design Interview", type: "practice", progress: 0 }
-            ]
+            activePaths: pathsWithMeta,
         };
     }
 
     async getCourses(userId: string) {
-        // In real app, fetch from LearningPath table
-        // For MVP, return mock list if empty
         const paths = await this.prisma.learningPath.findMany({
-            where: { userId }
+            where: { userId },
+            include: {
+                nodes: true,
+            },
         });
 
-        if (paths.length === 0) {
-            return [
-                { id: '1', title: 'Fullstack Development', progress: 35, totalNodes: 20, completedNodes: 7 },
-                { id: '2', title: 'AI Engineering', progress: 10, totalNodes: 15, completedNodes: 1.5 }
-            ];
-        }
-
-        return paths;
+        return paths.map(path => ({
+            id: path.id,
+            title: path.topic,
+            progress: path.progress,
+            totalNodes: path.nodes.length,
+            completedNodes: path.nodes.filter(n => n.status === 'COMPLETED').length,
+        }));
     }
 }

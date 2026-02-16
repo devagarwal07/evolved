@@ -1,32 +1,45 @@
-
-import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Delete,
+    Body,
+    Param,
+    UseGuards,
+    Request,
+} from '@nestjs/common';
 import { TutorService } from './tutor.service';
-// import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Assuming you have this, otherwise omit for now or use mock user
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateSessionDto } from './dto/create-session.dto';
+import { SendMessageDto } from './dto/send-message.dto';
 
 @Controller('tutor')
+@UseGuards(JwtAuthGuard)
 export class TutorController {
     constructor(private readonly tutorService: TutorService) { }
 
-    // @UseGuards(JwtAuthGuard)
     @Post('session')
-    createSession(@Body() body: { userId: string, topic: string }) {
-        // In real app, get userId from Request.user
-        // For MVP without strict auth guard on this route yet:
-        return this.tutorService.createSession(body.userId, body.topic);
+    createSession(@Request() req: any, @Body() dto: CreateSessionDto) {
+        return this.tutorService.createSession(req.user.id, dto.topic);
     }
 
-    @Get('sessions/:userId')
-    getSessions(@Param('userId') userId: string) {
-        return this.tutorService.getSessions(userId);
+    @Get('sessions')
+    getSessions(@Request() req: any) {
+        return this.tutorService.getSessions(req.user.id);
     }
 
-    @Get('session/:id/:userId')
-    getSession(@Param('id') id: string, @Param('userId') userId: string) {
-        return this.tutorService.getSession(id, userId);
+    @Get('session/:id')
+    getSession(@Request() req: any, @Param('id') id: string) {
+        return this.tutorService.getSession(id, req.user.id);
+    }
+
+    @Delete('session/:id')
+    deleteSession(@Request() req: any, @Param('id') id: string) {
+        return this.tutorService.deleteSession(id, req.user.id);
     }
 
     @Post('message')
-    sendMessage(@Body() body: { sessionId: string, userId: string, content: string }) {
-        return this.tutorService.sendMessage(body.sessionId, body.userId, body.content);
+    sendMessage(@Request() req: any, @Body() dto: SendMessageDto) {
+        return this.tutorService.sendMessage(dto.sessionId, req.user.id, dto.content);
     }
 }

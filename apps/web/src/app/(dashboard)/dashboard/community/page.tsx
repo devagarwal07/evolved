@@ -1,182 +1,240 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { PlusCircle, Sparkles, Code, Rocket, Languages, Flame, Send, Users } from "lucide-react";
+import { PlusCircle, Users, Loader2, LogIn, LogOut, Trash2, Sparkles, Crown } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
+
+interface RoomMember {
+    id: string;
+    role: string;
+    user: { id: string; name: string | null; avatar: string | null; xp?: number };
+}
+
+interface StudyRoom {
+    id: string;
+    name: string;
+    topic: string;
+    isActive: boolean;
+    _count?: { members: number };
+    members?: RoomMember[];
+    createdAt: string;
+}
 
 export default function CommunityPage() {
+    const { user } = useAuth();
+    const [rooms, setRooms] = useState<StudyRoom[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [roomName, setRoomName] = useState("");
+    const [roomTopic, setRoomTopic] = useState("");
+    const [activeRoom, setActiveRoom] = useState<StudyRoom | null>(null);
+    const [isCreating, setIsCreating] = useState(false);
+
+    useEffect(() => {
+        if (user?.id) loadRooms();
+    }, [user?.id]);
+
+    const loadRooms = async () => {
+        try {
+            setIsLoading(true);
+            const res = await api.get("/community/rooms");
+            setRooms(res.data);
+        } catch (err) { console.error(err); }
+        finally { setIsLoading(false); }
+    };
+
+    const createRoom = async () => {
+        if (!roomName.trim() || !roomTopic.trim()) return;
+        setIsCreating(true);
+        try {
+            const res = await api.post("/community/rooms", { name: roomName.trim(), topic: roomTopic.trim() });
+            setRooms(prev => [res.data, ...prev]);
+            setRoomName("");
+            setRoomTopic("");
+            setShowForm(false);
+            setActiveRoom(res.data);
+        } catch (err) { console.error(err); }
+        finally { setIsCreating(false); }
+    };
+
+    const viewRoom = async (id: string) => {
+        try {
+            const res = await api.get(`/community/rooms/${id}`);
+            setActiveRoom(res.data);
+        } catch (err) { console.error(err); }
+    };
+
+    const joinRoom = async (id: string) => {
+        try {
+            const res = await api.post(`/community/rooms/${id}/join`);
+            setActiveRoom(res.data);
+            loadRooms();
+        } catch (err: any) {
+            if (err.response?.status === 400) viewRoom(id); // Already member
+            else console.error(err);
+        }
+    };
+
+    const leaveRoom = async (id: string) => {
+        try {
+            await api.post(`/community/rooms/${id}/leave`);
+            setActiveRoom(null);
+            loadRooms();
+        } catch (err) { console.error(err); }
+    };
+
+    const deleteRoom = async (id: string) => {
+        try {
+            await api.delete(`/community/rooms/${id}`);
+            setActiveRoom(null);
+            loadRooms();
+        } catch (err) { console.error(err); }
+    };
+
+    const isMember = (room: StudyRoom) => room.members?.some(m => m.user.id === user?.id);
+    const isHost = (room: StudyRoom) => room.members?.some(m => m.user.id === user?.id && m.role === "host");
+
     return (
-        <div className="space-y-16 max-w-7xl mx-auto">
-            {/* Hero Section */}
-            <div className="text-center space-y-6 pt-8">
+        <div className="max-w-5xl mx-auto space-y-8 p-6">
+            {/* Header */}
+            <div className="text-center space-y-4">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium">
-                    <Users className="w-4 h-4" />
-                    Social Learning is 40% more effective
+                    <Users className="w-4 h-4" /> Social Learning
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-white">
-                    Learn Together.<br /><span className="text-gradient-primary">Evolve Together.</span>
+                <h1 className="text-3xl font-bold tracking-tighter text-white">
+                    Learn Together. <span className="text-gradient-primary">Evolve Together.</span>
                 </h1>
-                <p className="text-slate-500 text-lg max-w-2xl mx-auto leading-relaxed">
-                    Unlock higher retention rates through peer teaching, collaborative solving, and AI-moderated study sessions.
-                </p>
-                <div className="flex justify-center gap-4 pt-4">
-                    <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-6 rounded-xl font-bold text-base shadow-xl shadow-primary/20">
-                        Start Learning With Friends
-                    </Button>
-                    <Button variant="outline" className="px-8 py-6 rounded-xl font-bold text-base border-white/10 hover:bg-white/[0.04]">
-                        Explore Groups
-                    </Button>
-                </div>
+                <p className="text-slate-500 max-w-lg mx-auto">Create study rooms, collaborate with peers, and accelerate your learning.</p>
             </div>
 
-            {/* Virtual Study Rooms */}
-            <div className="space-y-6">
-                <div className="flex items-end justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold tracking-tight text-white">Virtual Study Rooms</h2>
-                        <p className="text-sm text-slate-500">Join a live session or create your own hub.</p>
-                    </div>
-                    <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10 gap-2 rounded-xl">
-                        <PlusCircle className="w-4 h-4" /> Create Room
-                    </Button>
-                </div>
-
-                <div className="glass-card p-8 grid lg:grid-cols-12 gap-8">
-                    {/* Whiteboard / Live Session */}
-                    <div className="lg:col-span-8 bg-black/40 rounded-xl border border-white/10 p-6 relative min-h-[400px] flex flex-col">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="flex items-center gap-3">
-                                <span className="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-[10px] font-bold border border-secondary/20">LIVE</span>
-                                <h3 className="text-lg font-bold text-white">Organic Chemistry: Molecular Bonds</h3>
-                            </div>
-                            <div className="flex items-center gap-2 px-3 py-1 bg-primary/15 text-primary rounded-lg text-[10px] font-bold animate-pulse border border-primary/15">
-                                <Sparkles className="w-3 h-3" /> AI MODERATOR ACTIVE
-                            </div>
-                        </div>
-                        <div className="flex-1 flex items-center justify-center opacity-50 border-2 border-dashed border-white/10 rounded-xl">
-                            <span className="text-slate-600 text-sm">[Interactive Whiteboard]</span>
-                        </div>
-                        <div className="mt-4 flex -space-x-2">
-                            {[1, 2, 3].map((i) => (
-                                <Avatar key={i} className="border-2 border-[#050507] w-10 h-10">
-                                    <AvatarImage src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${i + 30}`} />
-                                </Avatar>
-                            ))}
-                            <div className="w-10 h-10 rounded-full border-2 border-[#050507] bg-primary flex items-center justify-center text-[10px] font-bold text-white">+12</div>
-                        </div>
-                    </div>
-
-                    {/* Chat Side */}
-                    <div className="lg:col-span-4 flex flex-col gap-4 h-full">
-                        <div className="flex-1 bg-black/20 rounded-xl border border-white/[0.08] p-4 space-y-4 overflow-y-auto">
-                            <div className="flex gap-3">
-                                <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center text-secondary shrink-0">
-                                    <Sparkles className="w-4 h-4" />
-                                </div>
-                                <div className="bg-secondary/10 p-3 rounded-xl text-sm text-slate-200 border border-secondary/10">
-                                    <span className="font-bold text-secondary block mb-1 text-[10px]">AI Moderator</span>
-                                    Who can explain why carbon forms four covalent bonds?
-                                </div>
-                            </div>
-                            <div className="flex gap-3 justify-end">
-                                <div className="bg-primary/10 p-3 rounded-xl text-sm text-slate-200 border border-primary/10">
-                                    <span className="font-bold text-primary block mb-1 text-[10px]">Alex</span>
-                                    It has 4 valence electrons?
-                                </div>
-                            </div>
-                        </div>
-                        <div className="relative">
-                            <input className="w-full pill-input pl-4 pr-10 py-2.5 rounded-xl" placeholder="Type..." />
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary p-1.5 rounded-lg cursor-pointer hover:bg-primary/90 transition-colors">
-                                <Send className="w-3.5 h-3.5 text-white" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Create Room */}
+            <div className="flex justify-center">
+                <Button onClick={() => setShowForm(!showForm)} className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20">
+                    <PlusCircle className="w-4 h-4 mr-2" /> Create Study Room
+                </Button>
             </div>
 
-            {/* Group Challenges */}
-            <div className="space-y-6">
-                <h2 className="text-2xl font-bold tracking-tight text-white">Group Challenges</h2>
-                <div className="grid md:grid-cols-3 gap-6">
-                    {[
-                        { name: "The Big-O Blitz", subject: "Computer Science", icon: Code, progress: 72, joined: "842+", gradient: "from-primary/30" },
-                        { name: "Relativity Deep Dive", subject: "Physics", icon: Rocket, progress: 15, joined: "2.1k", gradient: "from-blue-600/30", featured: true },
-                        { name: "Global Literature Club", subject: "Languages", icon: Languages, progress: 45, joined: "450", gradient: "from-emerald-500/30" },
-                    ].map((challenge, i) => (
-                        <div key={i} className={`glass-card p-6 ${challenge.featured ? "border-primary/20 shadow-lg shadow-primary/5" : ""} hover:border-primary/20 transition-all cursor-pointer group`}>
-                            <div className={`h-28 mb-6 rounded-xl bg-gradient-to-br ${challenge.gradient} to-black relative flex items-center justify-center`}>
-                                <challenge.icon className="text-white/20 w-10 h-10" />
-                                <div className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded text-[10px] text-secondary font-bold border border-secondary/20">{challenge.subject}</div>
-                            </div>
-                            <h3 className="text-base font-bold text-white mb-3">{challenge.name}</h3>
-                            <div className="space-y-2 mb-4">
-                                <div className="flex justify-between text-[10px] font-bold text-slate-500">
-                                    <span>Progress</span>
-                                    <span className="text-secondary">{challenge.progress}%</span>
-                                </div>
-                                <div className="xp-bar">
-                                    <div className="xp-bar-fill" style={{ width: `${challenge.progress}%` }} />
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-bold text-slate-500">{challenge.joined} joined</span>
-                                <Button size="sm" className="rounded-xl bg-primary hover:bg-primary/80 text-xs">Join</Button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Leaderboard Section */}
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold tracking-tight text-white">Global Leaderboard</h2>
-                    <div className="flex glass-card p-1 rounded-full">
-                        <button className="px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-white">Weekly</button>
-                        <button className="px-4 py-1.5 rounded-full text-xs font-bold text-slate-500 hover:bg-white/[0.04]">Monthly</button>
+            {showForm && (
+                <div className="glass-card p-6 max-w-lg mx-auto space-y-4">
+                    <h3 className="text-base font-bold text-white">New Study Room</h3>
+                    <input type="text" value={roomName} onChange={e => setRoomName(e.target.value)}
+                        placeholder="Room name (e.g., ML Study Group)"
+                        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/40 text-sm" autoFocus />
+                    <input type="text" value={roomTopic} onChange={e => setRoomTopic(e.target.value)}
+                        placeholder="Topic (e.g., Machine Learning)"
+                        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary/40 text-sm"
+                        onKeyDown={e => e.key === "Enter" && createRoom()} />
+                    <div className="flex gap-3">
+                        <Button onClick={createRoom} disabled={!roomName.trim() || !roomTopic.trim() || isCreating} className="bg-primary hover:bg-primary/90 text-white rounded-xl">
+                            {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}
+                        </Button>
+                        <Button onClick={() => setShowForm(false)} variant="ghost" className="text-slate-400 rounded-xl">Cancel</Button>
                     </div>
                 </div>
-                <div className="glass-card overflow-hidden">
-                    <table className="w-full text-left">
-                        <thead className="bg-white/[0.03] text-[10px] uppercase text-slate-500">
-                            <tr>
-                                <th className="px-6 py-4 font-bold">Rank</th>
-                                <th className="px-6 py-4 font-bold">Learner</th>
-                                <th className="px-6 py-4 font-bold">XP</th>
-                                <th className="px-6 py-4 font-bold">Streak</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/[0.04] text-sm">
-                            <tr className="hover:bg-white/[0.03] transition-colors">
-                                <td className="px-6 py-4 font-bold text-yellow-500">01</td>
-                                <td className="px-6 py-4 flex items-center gap-3">
-                                    <Avatar className="w-8 h-8"><AvatarImage src="https://api.dicebear.com/9.x/avataaars/svg?seed=Julian" /></Avatar>
-                                    <span className="font-bold text-white">Julian V.</span>
-                                </td>
-                                <td className="px-6 py-4 font-bold text-secondary">12,840 XP</td>
-                                <td className="px-6 py-4 font-bold text-orange-500 flex items-center gap-1"><Flame className="w-3 h-3" /> 42 days</td>
-                            </tr>
-                            <tr className="bg-primary/10 border-y border-primary/20">
-                                <td className="px-6 py-4 font-bold text-white">14</td>
-                                <td className="px-6 py-4 flex items-center gap-3">
-                                    <Avatar className="w-8 h-8 border border-white"><AvatarImage src="https://github.com/shadcn.png" /></Avatar>
-                                    <span className="font-bold text-white">Alex Morgan (You)</span>
-                                </td>
-                                <td className="px-6 py-4 font-bold text-secondary">4,210 XP</td>
-                                <td className="px-6 py-4 font-bold text-orange-500 flex items-center gap-1"><Flame className="w-3 h-3" /> 12 days</td>
-                            </tr>
-                            <tr className="hover:bg-white/[0.03] transition-colors">
-                                <td className="px-6 py-4 font-bold text-slate-500">15</td>
-                                <td className="px-6 py-4 flex items-center gap-3">
-                                    <Avatar className="w-8 h-8"><AvatarImage src="https://api.dicebear.com/9.x/avataaars/svg?seed=Elena" /></Avatar>
-                                    <span className="font-bold text-white">Elena R.</span>
-                                </td>
-                                <td className="px-6 py-4 font-bold text-secondary">4,195 XP</td>
-                                <td className="px-6 py-4 font-bold text-orange-500 flex items-center gap-1"><Flame className="w-3 h-3" /> 5 days</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            )}
+
+            <div className="grid lg:grid-cols-12 gap-6">
+                {/* Room List */}
+                <div className="lg:col-span-5 space-y-3">
+                    <h2 className="text-lg font-bold text-white">Active Rooms</h2>
+                    {isLoading ? (
+                        <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 text-primary animate-spin" /></div>
+                    ) : rooms.length === 0 ? (
+                        <div className="text-center py-12 glass-card">
+                            <Users size={40} className="mx-auto mb-3 text-primary/30" />
+                            <p className="text-slate-500 text-sm">No rooms yet — create one!</p>
+                        </div>
+                    ) : (
+                        rooms.map(room => (
+                            <div key={room.id} onClick={() => viewRoom(room.id)}
+                                className={`glass-card p-4 cursor-pointer transition-all group ${activeRoom?.id === room.id ? "border-primary/20 bg-primary/5" : "hover:border-white/10"}`}>
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="text-sm font-bold text-white">{room.name}</h3>
+                                    <span className="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full border border-secondary/20 font-bold">{room.topic}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex -space-x-2">
+                                        {room.members?.slice(0, 3).map((m, i) => (
+                                            <Avatar key={i} className="w-6 h-6 border-2 border-[#050507]">
+                                                <AvatarImage src={m.user.avatar || `https://api.dicebear.com/9.x/avataaars/svg?seed=${m.user.name || m.user.id}`} />
+                                                <AvatarFallback className="text-[8px]">{m.user.name?.[0] || "?"}</AvatarFallback>
+                                            </Avatar>
+                                        ))}
+                                        {(room._count?.members || 0) > 3 && (
+                                            <div className="w-6 h-6 rounded-full bg-white/[0.08] border-2 border-[#050507] flex items-center justify-center text-[8px] font-bold text-slate-400">
+                                                +{(room._count?.members || 0) - 3}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <span className="text-[10px] text-slate-500 font-medium">{room._count?.members || 0} members</span>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                {/* Room Detail */}
+                <div className="lg:col-span-7">
+                    {activeRoom ? (
+                        <div className="glass-card p-6 space-y-6">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h2 className="text-xl font-bold text-white">{activeRoom.name}</h2>
+                                    <span className="text-xs text-secondary bg-secondary/10 px-2 py-0.5 rounded-full border border-secondary/20 font-bold">{activeRoom.topic}</span>
+                                </div>
+                                <div className="flex gap-2">
+                                    {isMember(activeRoom) ? (
+                                        <Button size="sm" variant="outline" onClick={() => leaveRoom(activeRoom.id)} className="text-red-400 border-red-500/20 hover:bg-red-500/10 rounded-xl">
+                                            <LogOut size={14} className="mr-1" /> Leave
+                                        </Button>
+                                    ) : (
+                                        <Button size="sm" onClick={() => joinRoom(activeRoom.id)} className="bg-primary hover:bg-primary/90 text-white rounded-xl">
+                                            <LogIn size={14} className="mr-1" /> Join
+                                        </Button>
+                                    )}
+                                    {isHost(activeRoom) && (
+                                        <Button size="sm" variant="outline" onClick={() => deleteRoom(activeRoom.id)} className="text-red-400 border-red-500/20 hover:bg-red-500/10 rounded-xl">
+                                            <Trash2 size={14} />
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Members */}
+                            <div>
+                                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Members ({activeRoom.members?.length || 0})</h3>
+                                <div className="space-y-2">
+                                    {activeRoom.members?.map(member => (
+                                        <div key={member.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                                            <Avatar className="w-8 h-8">
+                                                <AvatarImage src={member.user.avatar || `https://api.dicebear.com/9.x/avataaars/svg?seed=${member.user.name || member.user.id}`} />
+                                                <AvatarFallback>{member.user.name?.[0] || "?"}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                                <span className="text-sm font-medium text-white">{member.user.name || "Anonymous"}</span>
+                                                {member.user.xp !== undefined && <span className="text-[10px] text-secondary ml-2">{member.user.xp} XP</span>}
+                                            </div>
+                                            {member.role === "host" && (
+                                                <span className="text-[10px] text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20 font-bold flex items-center gap-1">
+                                                    <Crown size={10} /> Host
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="glass-card flex items-center justify-center h-64 text-center">
+                            <div>
+                                <Users size={32} className="mx-auto mb-3 text-primary/30" />
+                                <p className="text-sm text-slate-500">Select a room to view details</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
